@@ -127,6 +127,7 @@ class ProfileTestCase(BaseTestCase):
 
         res = self.client.post("/accounts/profile/", {"create_api_key": "sample_key"})
         assert res.status_code == 200
+        self.assertEqual(str(list(res.context['messages'])[0]), "The API key has been created!")
 
         #  Check api_key after creating one
         self.profile.refresh_from_db()
@@ -143,6 +144,7 @@ class ProfileTestCase(BaseTestCase):
         # Revoke api_key
         res = self.client.post("/accounts/profile/", {"revoke_api_key": "sample_key"})
         assert res.status_code == 200
+        self.assertEqual(str(list(res.context['messages'])[0]), "The API key has been revoked!")
 
         #  Check api_key after revoking one
         self.profile.refresh_from_db()
