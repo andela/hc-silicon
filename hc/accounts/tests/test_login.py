@@ -33,7 +33,6 @@ class LoginTestCase(TestCase):
 
         ### Assert that check is associated with the new user
         new_check = Check.objects.get(code=check.code)
-        print (new_check)
         self.assertTrue(new_check.user)
 
 
