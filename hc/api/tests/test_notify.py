@@ -222,4 +222,45 @@ class NotifyTestCase(BaseTestCase):
         json = kwargs["json"]
         self.assertEqual(json["message_type"], "CRITICAL")
 
+    @patch("hc.api.transports.requests.request")
+    def test_webhook_works(self, mock_get):
+        """
+            Test if webhook works
+        """
+        self._setup_data("webhook", "http://andela.com")
+        mock_get.return_value.status_code = 200
+        self.channel.notify(self.check)
+        mock_get.assert_called_with(
+            "get", "http://andela.com",
+            headers={"User-Agent": "healthchecks.io"}, timeout=5)
+    
+    @patch("hc.api.transports.requests.request")
+    def test_webhook_500(self, mock_post):
+        self._setup_data("webhook", "http://andela.com")
+        mock_post.return_value.status_code = 500
+        self.channel.notify(self.check)
+        n = Notification.objects.get()
+        self.assertEqual(n.error, "Received status code 500")
+
+    @patch("hc.api.transports.requests.request", side_effect=ConnectionError)
+    def test_webhooks_connection_errors(self, mock_get):
+        """
+            Test webhook connection error
+        """
+        self._setup_data("webhook", "http://andela.com")
+        self.channel.notify(self.check)
+        n = Notification.objects.get()
+        self.assertEqual(n.error, "Connection failed")
+    
+    @patch("hc.api.transports.requests.request", side_effect=Timeout)
+    def test_webhook_handles_timeout(self, mock_post):
+        """
+            Check webhook connection time out
+        """
+        self._setup_data("webhook", "http://andela.com")
+
+        self.channel.notify(self.check)
+
+        n = Notification.objects.get()
+        self.assertEqual(n.error, "Connection timed out")
     ### Test that the web hooks handle connection errors and error 500s
