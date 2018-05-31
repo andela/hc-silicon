@@ -79,4 +79,18 @@ class AddPushoverTestCase(BaseTestCase):
 
         r = self.client.get("/integrations/add_pushover/?%s" % params)
         assert r.status_code == 403
+        
+    def test_validates_priority(self):
+        """
+            Test adding pushover validates priority
+        """
+        self.client.login(username="alice@example.org", password="password")
+
+        session = self.client.session
+        session["po_nonce"] = "n"
+        session.save()
+
+        params = "pushover_user_key=a&nonce=n&prio=Invalid"
+        r = self.client.get("/integrations/add_pushover/?%s" % params)
+        assert r.status_code == 400
     ### Test that pushover validates priority
