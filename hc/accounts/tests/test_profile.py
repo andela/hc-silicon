@@ -1,7 +1,7 @@
 from django.core import mail
 
 from hc.test import BaseTestCase
-from hc.accounts.models import Member
+from hc.accounts.models import Member, Profile
 from hc.api.models import Check
 
 
@@ -18,8 +18,12 @@ class ProfileTestCase(BaseTestCase):
         self.alice.profile.refresh_from_db()
         token = self.alice.profile.token
         ### Assert that the token is set
-
+        q = Profile.objects.filter(token=token)
+        self.assertEqual(q.count(), 1)
         ### Assert that the email was sent and check email content
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Set password on healthchecks.io')
+        self.assertIn("Here's a link to set a password", mail.outbox[0].body)
 
     def test_it_sends_report(self):
         check = Check(name="Test Check", user=self.alice)
@@ -28,6 +32,9 @@ class ProfileTestCase(BaseTestCase):
         self.alice.profile.send_report()
 
         ###Assert that the email was sent and check email content
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Monthly Report")
+        self.assertIn("This is a monthly report sent by healthchecks.io.", mail.outbox[0].body)
 
     def test_it_adds_team_member(self):
         self.client.login(username="alice@example.org", password="password")
@@ -41,10 +48,13 @@ class ProfileTestCase(BaseTestCase):
             member_emails.add(member.user.email)
 
         ### Assert the existence of the member emails
-
+        self.assertNotEqual(len(member_emails), 0)
         self.assertTrue("frank@example.org" in member_emails)
 
         ###Assert that the email was sent and check email content
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], "frank@example.org")
+        self.assertIn("alice@example.org invites you to their healthchecks.io account.", mail.outbox[0].body)
 
     def test_add_team_member_checks_team_access_allowed_flag(self):
         self.client.login(username="charlie@example.org", password="password")
@@ -108,3 +118,35 @@ class ProfileTestCase(BaseTestCase):
         self.assertNotContains(r, "bobs-tag.svg")
 
     ### Test it creates and revokes API key
+    def test_it_create_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+
+        # Check api_key before creating one
+        api_key = self.alice.profile.api_key
+        self.assertEqual(api_key, 'abc')
+
+        res = self.client.post("/accounts/profile/", {"create_api_key": "sample_key"})
+        assert res.status_code == 200
+        self.assertEqual(str(list(res.context['messages'])[0]), "The API key has been created!")
+
+        #  Check api_key after creating one
+        self.profile.refresh_from_db()
+        api_key = self.alice.profile.api_key
+        self.assertNotEqual(api_key, 'abc')
+
+    def test_it_revoke_api_key(self):
+        self.client.login(username="alice@example.org", password="password")
+
+        # Check api_key before revoking
+        api_key = self.alice.profile.api_key
+        self.assertNotEqual(api_key, '')
+
+        # Revoke api_key
+        res = self.client.post("/accounts/profile/", {"revoke_api_key": "sample_key"})
+        assert res.status_code == 200
+        self.assertEqual(str(list(res.context['messages'])[0]), "The API key has been revoked!")
+
+        #  Check api_key after revoking one
+        self.profile.refresh_from_db()
+        api_key = self.alice.profile.api_key
+        self.assertEqual(api_key, '')
