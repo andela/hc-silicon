@@ -55,6 +55,10 @@
                 <td>{{ check.grace|hc_duration }}</td>
             </tr>
             <tr>
+                <th>Nag Time</th>
+                <td>{{ check.nag|hc_duration }}</td>
+            </tr>
+            <tr>
                 <th>Last Ping</th>
                 <td>
                     {% if check.last_ping %}
