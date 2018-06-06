@@ -1,0 +1,47 @@
+{% load hc_extras humanize %}
+
+<ul id="checks-list" class="visible-xs">
+    {% for check in checks %}
+    <li>
+        <h2>
+            <span class="{% if not check.name %}unnamed{% endif %}">
+                {{ check.name|default:"unnamed" }}
+            </span>
+
+            <code>{{ check.code }}</code>
+        </h2>
+        
+        <table class="table">
+            <tr>
+                <th>Status</th>
+                <td>
+                  <span class="label label-danger">DOWN</span>
+                </td>
+            </tr>
+            {% if check.tags %}
+            <tr>
+                <th>Tags</th>
+                <td>
+                    {% for tag in check.tags_list %}
+                    <span class="label label-tag">{{ tag }}</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>Last Ping</th>
+                <td>
+                  {{ check.last_ping|naturaltime }}
+                </td>
+            </tr>
+        </table>
+
+        <div>
+
+          <a href="{% url 'hc-log' check.code %}" class="btn btn-default">Log</a>
+
+        </div>
+
+    </li>
+    {% endfor %}
+</ul>
