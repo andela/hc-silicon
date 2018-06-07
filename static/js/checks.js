@@ -32,7 +32,7 @@ $(function () {
 
     var periodSlider = document.getElementById("period-slider");
     noUiSlider.create(periodSlider, {
-        start: [50],
+        start: [20],
         connect: "lower",
         range: {
             'min': [60, 60],
