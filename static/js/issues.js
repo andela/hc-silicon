@@ -30,10 +30,6 @@ $(function () {
         return result;
     }
 
-
-
-
-
     $('[data-toggle="tooltip"]').tooltip();
 
     $(".my-checks-name").click(function () {
@@ -57,7 +53,6 @@ $(function () {
 
         return false;
     });
-
 
     $("#my-checks-tags button").click(function () {
         // .active has not been updated yet by bootstrap code,
@@ -102,7 +97,6 @@ $(function () {
         return false;
     });
 
-
     $(".usage-examples").click(function (e) {
         var a = e.target;
         var url = a.getAttribute("data-url");
@@ -114,7 +108,6 @@ $(function () {
         $("#show-usage-modal").modal("show");
         return false;
     });
-
 
     var clipboard = new Clipboard('button.copy-link');
     $("button.copy-link").mouseout(function (e) {
@@ -132,6 +125,5 @@ $(function () {
         var text = e.trigger.getAttribute("data-clipboard-text");
         prompt("Press Ctrl+C to select:", text)
     });
-
 
 });
