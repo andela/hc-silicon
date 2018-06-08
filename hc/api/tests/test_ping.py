@@ -1,13 +1,19 @@
 from django.test import Client, TestCase
+from django.core import mail
 
-from hc.api.models import Check, Ping
+from hc.api.models import Check, Ping, User
 
 
 class PingTestCase(TestCase):
 
     def setUp(self):
         super(PingTestCase, self).setUp()
-        self.check = Check.objects.create()
+        user = User(username="ned", email="ned@example.org")
+        user.set_password("password")
+        user.save()
+        check = Check(user=user)
+        check.save()
+        self.check = check
 
     def test_it_works(self):
         r = self.client.get("/ping/%s/" % self.check.code)
@@ -100,3 +106,17 @@ class PingTestCase(TestCase):
     ### Test that when a ping is made a check with a paused status changes status
     ### Test that a post to a ping works
     ### Test that the csrf_client head works
+
+    def test_it_sends_notification(self):
+        # Run a job often by pinging twice
+        ip = "1.1.1.1"
+        r = self.client.get("/ping/%s/" % self.check.code,
+                            HTTP_X_FORWARDED_FOR=ip)
+        r = self.client.get("/ping/%s/" % self.check.code,
+                            HTTP_X_FORWARDED_FOR=ip)
+
+        # Assert that the a warning email was sent the user
+        self.assertEqual(len(mail.outbox), 1)
+        check_code = str(self.check.code)
+        self.assertEqual(mail.outbox[0].subject, check_code+" is too often")
+        self.assertIn("The check \"{}\" has gone too often.".format(check_code), mail.outbox[0].body)
