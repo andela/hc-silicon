@@ -25,25 +25,36 @@
                 <form method="post">
                     {% csrf_token %}
                     <h2>Reports</h2>
-                    <label>
+                    <label class="radiobtn">
                         <input
-                            name="reports_allowed"
-                            type="checkbox"
-                            {% if profile.reports_allowed %} checked {% endif %}>
+                            name="reports_frequency"
+                            type="radio"
+                            value="Disabled"
+                            {% if profile.reports_frequency == "Disabled" %} checked {% endif %}>
+                        Don't send me anything
+                    </label>
+                    <label class="radiobtn">
+                        <input
+                            name="reports_frequency"
+                            type="radio"
+                            value="Daily"
+                            {% if profile.reports_frequency == "Daily" %} checked {% endif %}>
                         Each day send me a summary of my checks
                     </label>
-                    <label>
+                    <label class="radiobtn">
                         <input
-                            name="reports_allowed"
-                            type="checkbox"
-                            {% if profile.reports_allowed %} checked {% endif %}>
+                            name="reports_frequency"
+                            type="radio"
+                            value="Weekly"
+                            {% if profile.reports_frequency == "Weekly" %} checked {% endif %}>
                         Each week send me a summary of my checks
                     </label>
-                    <label>
+                    <label class="radiobtn">
                         <input
-                            name="reports_allowed"
-                            type="checkbox"
-                            {% if profile.reports_allowed %} checked {% endif %}>
+                            name="reports_frequency"
+                            type="radio"
+                            value="Monthly"
+                            {% if profile.reports_frequency == "Monthly" %} checked {% endif %}>
                         Each month send me a summary of my checks
                     </label>
                     <button
@@ -70,7 +81,8 @@
             </div>
         </div>
     </div>
-
+</div>
+<div class="row">
     <div class="col-sm-6">
         <div class="panel panel-default">
             <div class="panel-body settings-block">
