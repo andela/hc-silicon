@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{% static 'css/log.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/add_pushover.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/settings.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/radio.css' %}" type="text/css">
     {% endcompress %}
 </head>
 <body class="page-{{ page }}">
@@ -122,6 +123,9 @@
                         {% endif %}
 
                         <li><a href="{% url 'hc-profile' %}">Account Settings</a></li>
+                        <li role="separator" class="divider"></li>
+
+                        <li><a href="{% url 'hc-reports' %}">Check Reports</a></li>
                         <li role="separator" class="divider"></li>
 
                         {% for team in request.teams %}
