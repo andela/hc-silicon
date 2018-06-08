@@ -55,8 +55,22 @@ class Profile(models.Model):
 
     def send_report(self):
         # reset next report date first:
+        day = timezone.timedelta(days=0)
+        if self.reports_frequency == 'Disabled':
+            self.reports_allowed = False
+            self.reports_frequency = 'Disabled'
+
+        if self.reports_frequency == 'Daily':
+            day = timezone.timedelta(days=1)
+
+        elif self.reports_frequency == 'Weekly':
+            day = timezone.timedelta(days=7)
+
+        elif self.reports_frequency == 'Monthly':
+            day = timezone.timedelta(days=30)
+
         now = timezone.now()
-        self.next_report_date = now + timedelta(days=30)
+        self.next_report_date = now + day
         self.save()
 
         token = signing.Signer().sign(uuid.uuid4())
@@ -66,6 +80,7 @@ class Profile(models.Model):
         ctx = {
             "checks": self.user.check_set.order_by("created"),
             "now": now,
+            "Duration": self.reports_frequency,
             "unsub_link": unsub_link
         }
 
