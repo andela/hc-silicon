@@ -58,3 +58,10 @@ class MyChecksTestCase(BaseTestCase):
 
         # Mobile
         self.assertContains(r, "label-warning")
+    
+    def test_issues_page(self):
+        """Test unresolved issues page"""
+        self.client.login(username="alice@example.org", password="password")
+        url = "/issues/"
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)

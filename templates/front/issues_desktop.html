@@ -1,0 +1,68 @@
+{% load hc_extras humanize %}
+<table id="checks-table" class="table hidden-xs">
+    <tr>
+        <th></th>
+        <th class="th-name">Name</th>
+        <th>Ping URL</th>
+        <th>Last Ping</th>
+    </tr>
+    {% for check in checks %}
+    <tr class="checks-row">
+        <td class="indicator-cell">
+          <span class="status icon-down"></span>
+        </td>
+        <td class="name-cell">
+            <div data-name="{{ check.name }}"
+                    data-tags="{{ check.tags }}"
+                    data-url="{% url 'hc-update-name' check.code %}"
+                    class="my-checks-name {% if not check.name %}unnamed{% endif %}">
+                <div>{{ check.name|default:"unnamed" }}</div>
+                {% for tag in check.tags_list %}
+                <span class="label label-tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </td>
+        <td class="url-cell">
+            <span class="my-checks-url">
+                <span class="base">{{ ping_endpoint }}</span>{{ check.code }}
+            </span>
+            <button
+                class="copy-link hidden-sm"
+                data-clipboard-text="{{ check.url }}">
+                copy
+            </button>
+        </td>
+        <td>
+          <span
+              data-toggle="tooltip"
+              title="{{ check.last_ping|date:'N j, Y, P e' }}">
+              {{ check.last_ping|naturaltime }}
+          </span>
+        </td>
+        <td>
+            <div class="check-menu dropdown">
+                <button class="btn btn-sm btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                <span class="icon-settings" aria-hidden="true"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="{% url 'hc-log' check.code %}">
+                            Log
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="usage-examples"
+                            data-url="{{ check.url }}"
+                            data-email="{{ check.email }}">
+                            Usage Examples
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>

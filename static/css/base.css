@@ -62,6 +62,7 @@ body {
 .status.icon-grace { color: #f0ad4e; }
 .status.icon-down { color: #d9534f; }
 .status.icon-nag { color: #e646b0; }
+.status.icon-up.often { color: #e0f712; }
 
 .hc-dialog {
     background: #FFF;

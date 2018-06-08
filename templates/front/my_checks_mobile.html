@@ -33,6 +33,8 @@
                         <span class="label label-success">UP</span>
                     {% elif check.get_status == "down" %}
                         <span class="label label-danger">DOWN</span>
+                    {% elif check.get_status == "too often" %}
+                        <span class="label label-warning">EARLY</span>
                     {% endif %}
                 </td>
             </tr>
