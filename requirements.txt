@@ -7,10 +7,7 @@ django-appconf==1.0.1
 django-compressor==2.1
 django-ses-backend==0.1.1
 djmail==0.11.0
-funcsigs==1.0.2
 futures==3.0.3
-mock==2.0.0
-pbr==4.0.3
 gunicorn==19.8.1
 lxml==4.2.1
 premailer==2.9.6

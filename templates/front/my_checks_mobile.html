@@ -33,6 +33,8 @@
                         <span class="label label-success">UP</span>
                     {% elif check.get_status == "down" %}
                         <span class="label label-danger">DOWN</span>
+                    {% elif check.get_status == "too often" %}
+                        <span class="label label-warning">EARLY</span>
                     {% endif %}
                 </td>
             </tr>
@@ -53,6 +55,10 @@
             <tr>
                 <th>Grace Time</th>
                 <td>{{ check.grace|hc_duration }}</td>
+            </tr>
+            <tr>
+                <th>Nag Time</th>
+                <td>{{ check.nag|hc_duration }}</td>
             </tr>
             <tr>
                 <th>Last Ping</th>

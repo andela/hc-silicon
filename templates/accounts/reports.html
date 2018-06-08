@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load compress staticfiles %}
+
+{% block title %}Account Settings - healthchecks.io{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <h1 class="settings-title">Settings</h1>
+    </div>
+    {% if messages %}
+    <div class="col-sm-12">
+        {% for message in messages %}
+            <p class="alert alert-{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-body settings-block">
+              <div class="tab-content">
+                  <div role="tabpanel" class="tab-pane active" id="crontab">
+                      <div class="row">
+                          <div class="col-sm-12">
+                              <!-- <h4 class="settings-title">Currently Available Reports:</h4> -->
+
+                          {% if checks %}
+                              {% include "front/reports_desktop.html" %}
+
+                          {% else %}
+                          <div class="alert alert-info">You don't have any reports yet.</div>
+                          {% endif %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+{% endcompress %}
+{% endblock %}

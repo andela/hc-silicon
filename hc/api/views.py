@@ -10,6 +10,7 @@ from hc.api import schemas
 from hc.api.decorators import check_api_key, uuid_or_400, validate_json
 from hc.api.models import Check, Ping
 from hc.lib.badges import check_signature, get_badge_svg
+from hc.lib import emails
 
 
 @csrf_exempt
@@ -21,11 +22,23 @@ def ping(request, code):
     except Check.DoesNotExist:
         return HttpResponseBadRequest()
 
-    check.n_pings = F("n_pings") + 1
-    check.last_ping = timezone.now()
     if check.status in ("new", "paused"):
         check.status = "up"
 
+    if check.status not in ("down"):
+        if check.is_running_too_often():
+            q = Check.objects.filter(user=check.user)
+            check.status = "too often"
+            ctx = {
+                "checks": list(q),
+                "check":check
+            }
+            emails.alert(check.user.email, ctx)
+        else:
+            check.status = "up"
+
+    check.n_pings = F("n_pings") + 1
+    check.last_ping = timezone.now()
     check.save()
     check.refresh_from_db()
 
@@ -62,7 +75,8 @@ def checks(request):
             check.timeout = td(seconds=request.json["timeout"])
         if "grace" in request.json:
             check.grace = td(seconds=request.json["grace"])
-
+        if "nag" in request.json:
+            check.nag = td(seconds=request.json["nag"])
         check.save()
 
         # This needs to be done after saving the check, because of

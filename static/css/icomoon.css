@@ -60,3 +60,6 @@
 .icon-settings:before {
   content: "\e8b8";
 }
+.icon-nag:before {
+  content: "\e7f8";
+}

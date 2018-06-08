@@ -164,6 +164,7 @@ def update_timeout(request, code):
     if form.is_valid():
         check.timeout = td(seconds=form.cleaned_data["timeout"])
         check.grace = td(seconds=form.cleaned_data["grace"])
+        check.nag = td(seconds=form.cleaned_data["nag"])
         check.save()
 
     return redirect("hc-checks")
@@ -552,3 +553,18 @@ def privacy(request):
 
 def terms(request):
     return render(request, "front/terms.html", {})
+
+@login_required
+def unresolved_issues(request):
+    ''' Handle unresolved issues '''
+    assert request.method == "GET"
+    q = Check.objects.filter(user=request.team.user).order_by("created")
+
+    checks = [ check for check in q if check.get_status() is "down"]
+
+    ctx = {
+        "page": "issues",
+        "checks": checks,
+        "ping_endpoint": settings.PING_ENDPOINT,
+    }
+    return render(request, "front/issues.html", ctx)
