@@ -1,1 +1,3 @@
-web: gunicorn hc.wsgi && ./manage.py ensuretriggers && ./manage.py sendalerts
+web: gunicorn hc.wsgi
+worker: ./manage.py ensuretriggers
+worker: ./manage.py sendalerts
