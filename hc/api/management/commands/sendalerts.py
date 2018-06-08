@@ -21,8 +21,10 @@ class Command(BaseCommand):
         now = timezone.now()
         going_down = query.filter(alert_after__lt=now, status="up")
         going_up = query.filter(alert_after__gt=now, status="down")
+        nag_on = query.filter(nag_after__lt=now, nag_status=True, status="down")
         # Don't combine this in one query so Postgres can query using index:
-        checks = list(going_down.iterator()) + list(going_up.iterator())
+        checks = list(going_down.iterator()) + list(going_up.iterator()) + \
+                        list(nag_on.iterator())
         if not checks:
             return False
 
@@ -42,15 +44,28 @@ class Command(BaseCommand):
 
         # Save the new status. If sendalerts crashes,
         # it won't process this check again.
+        now = timezone.now()
         check.status = check.get_status()
-        check.save()
 
+        if check.status == "down":
+            check.nag_after = timezone.now() + check.nag
+            check.nag_status = True
+
+        check.save()
+        self.send_alert(check)
+        connection.close()
+        return True
+
+    def send_alert(self, check):
+        """Helper method to notify user"""
         tmpl = "\nSending alert, status=%s, code=%s\n"
         self.stdout.write(tmpl % (check.status, check.code))
         errors = check.send_alert()
-        for ch, error in errors:
-            self.stdout.write("ERROR: %s %s %s\n" % (ch.kind, ch.value, error))
-
+        if errors is not None:
+            for ch, error in errors:
+                self.stdout.write("ERROR: %s %s %s\n" %
+                                (ch.kind, ch.value, error))
+                                
         connection.close()
         return True
 

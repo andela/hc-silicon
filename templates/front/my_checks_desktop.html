@@ -27,6 +27,8 @@
                 <span class="status icon-grace"></span>
             {% elif check.get_status == "up" %}
                 <span class="status icon-up"></span>
+            {% elif check.in_nag_period == "nag" and check.get_status == "down"%}
+                <span class="status icon-nag"></span>
             {% elif check.get_status == "down" %}
                 <span class="status icon-down"></span>
             {% endif %}
@@ -62,6 +64,9 @@
                 <br />
                 <span class="checks-subline">
                 {{ check.grace|hc_duration }}
+                </span>
+                <span class="checks-subline">
+                {{ check.nag|hc_duration }}
                 </span>
             </span>
         </td>
