@@ -17,7 +17,7 @@ from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
-                               SetPasswordForm, TeamNameForm)
+                               SetPasswordForm, TeamNameForm, ReportsForm)
 from hc.accounts.models import Profile, Member
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
@@ -158,9 +158,9 @@ def profile(request):
         elif "show_api_key" in request.POST:
             show_api_key = True
         elif "update_reports_allowed" in request.POST:
-            form = ReportSettingsForm(request.POST)
+            form = ReportsForm(request.POST)
             if form.is_valid():
-                profile.reports_allowed = form.cleaned_data["reports_allowed"]
+                profile.reports_frequency = form.cleaned_data["reports_frequency"]
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
                 profile.send_report()
@@ -220,6 +220,7 @@ def profile(request):
         "profile": profile,
         "show_api_key": show_api_key
     }
+    print(profile.reports_frequency)
 
     return render(request, "accounts/profile.html", ctx)
 
