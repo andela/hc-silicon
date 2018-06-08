@@ -552,3 +552,18 @@ def privacy(request):
 
 def terms(request):
     return render(request, "front/terms.html", {})
+
+@login_required
+def unresolved_issues(request):
+    ''' Handle unresolved issues '''
+    assert request.method == "GET"
+    q = Check.objects.filter(user=request.team.user).order_by("created")
+
+    checks = [ check for check in q if check.get_status() is "down"]
+
+    ctx = {
+        "page": "issues",
+        "checks": checks,
+        "ping_endpoint": settings.PING_ENDPOINT,
+    }
+    return render(request, "front/issues.html", ctx)
