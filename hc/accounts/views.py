@@ -1,6 +1,10 @@
 import uuid
 import re
 
+from collections import Counter
+from django.utils import timezone
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -13,7 +17,7 @@ from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
-                               SetPasswordForm, TeamNameForm)
+                               SetPasswordForm, TeamNameForm, ReportsForm)
 from hc.accounts.models import Profile, Member
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
@@ -154,11 +158,12 @@ def profile(request):
         elif "show_api_key" in request.POST:
             show_api_key = True
         elif "update_reports_allowed" in request.POST:
-            form = ReportSettingsForm(request.POST)
+            form = ReportsForm(request.POST)
             if form.is_valid():
-                profile.reports_allowed = form.cleaned_data["reports_allowed"]
+                profile.reports_frequency = form.cleaned_data["reports_frequency"]
                 profile.save()
                 messages.success(request, "Your settings have been updated!")
+                profile.send_report()
         elif "invite_team_member" in request.POST:
             if not profile.team_access_allowed:
                 return HttpResponseForbidden()
@@ -215,8 +220,45 @@ def profile(request):
         "profile": profile,
         "show_api_key": show_api_key
     }
+    print(profile.reports_frequency)
 
     return render(request, "accounts/profile.html", ctx)
+
+
+@login_required
+def reports_dashboard(request):
+    profile = request.user.profile
+    new = Check.objects.filter(user=request.user)
+    q = new.filter(last_ping__isnull=False)
+
+    count = Counter()
+    checks = list(q)
+    down_tags, grace_tags = set(), set()
+    for check in checks:
+        status = check.get_status()
+        for tag in check.tags_list():
+            if tag == "":
+                continue
+
+            count[tag] += 1
+
+            if status == "down":
+                down_tags.add(tag)
+            elif check.in_grace_period():
+                grace_tags.add(tag)
+
+    ctx = {
+        "page": "reports",
+        "checks": checks,
+        "now": timezone.now(),
+        "tags": count.most_common(),
+        "down_tags": down_tags,
+        "grace_tags": grace_tags,
+        "reports_allowed": profile.reports_allowed,
+        "ping_endpoint": settings.PING_ENDPOINT
+    }
+
+    return render(request, 'accounts/reports.html', ctx, new)
 
 
 @login_required

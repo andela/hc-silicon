@@ -1,0 +1,7 @@
+.radiobtn {
+  display: block;
+  position: relative;
+  padding: 0 30px;
+  margin: 12px 0;
+  font-weight: normal;
+}

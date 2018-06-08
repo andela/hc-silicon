@@ -31,3 +31,7 @@ class RemoveTeamMemberForm(forms.Form):
 
 class TeamNameForm(forms.Form):
     team_name = forms.CharField(max_length=200, required=True)
+
+
+class ReportsForm(forms.Form):
+    reports_frequency = forms.CharField(required=True)
