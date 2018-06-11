@@ -132,6 +132,11 @@
                             1 day
                         </span>
                     </div>
+                    <div id="manual-slider">
+                        {% for check in checks %}
+                        Timeout Days: <input type="number" min="1" id="days" class="days" value= {{check.timeout}} >
+                        {% endfor %}
+                    </div>
                     <div id="period-slider"></div>
 
                     <div class="update-timeout-info text-center">
@@ -148,6 +153,12 @@
                         </span>
                     </div>
 
+                    <div id="manual-slider">
+                        {% for check in checks %}
+                        Grace Days: <input type="number" min="1" id="gracedays" class="days" value= {{check.grace}}>
+                        {% endfor %}
+                    </div>
+
                     <div id="grace-slider"></div>
 
                     <div class="update-timeout-info text-center">
@@ -162,6 +173,9 @@
                             class="update-timeout-value">
                             1 day
                         </span>
+                    </div>
+                    <div id="manual-slider">
+                        Nag Days: <input type="number" min="1" id="nagdays" class="days" value= {{check.nag}}>
                     </div>
                     <div id="nag-slider"></div>
 

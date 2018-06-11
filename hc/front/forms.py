@@ -19,9 +19,9 @@ class NameTagsForm(forms.Form):
 
 class TimeoutForm(forms.Form):
 
-    timeout = forms.IntegerField(min_value=60, max_value=3456000)
-    grace = forms.IntegerField(min_value=60, max_value=3456000)
-    nag = forms.IntegerField(min_value=60, max_value=3456000)
+    timeout = forms.IntegerField(min_value=60)
+    grace = forms.IntegerField(min_value=60)
+    nag = forms.IntegerField(min_value=60)
 
 
 
