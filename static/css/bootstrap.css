@@ -4703,6 +4703,15 @@ button.close {
   -webkit-overflow-scrolling: touch;
   outline: 0;
 }
+.days{
+  width:25%;
+  border-radius: 5px;
+  float: right;
+}
+#manual-slider {
+  margin-left:6%;
+  width:18%
+}
 .modal.fade .modal-dialog {
   -webkit-transform: translate(0, -25%);
   -ms-transform: translate(0, -25%);
