@@ -4704,13 +4704,13 @@ button.close {
   outline: 0;
 }
 .days{
-  width:25%;
+  width:55%;
   border-radius: 5px;
   float: right;
 }
 #manual-slider {
   margin-left:6%;
-  width:18%
+  width:28%
 }
 .modal.fade .modal-dialog {
   -webkit-transform: translate(0, -25%);
