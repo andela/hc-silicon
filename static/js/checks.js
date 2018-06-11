@@ -65,7 +65,13 @@ $(function () {
     });
     $('#days').change(function () {
         
-        periodSlider.noUiSlider.set(this.value * 3600 * 24);
+        var rounded = this.value * 3600 * 24;
+        if (rounded <= 2592000)
+        {periodSlider.noUiSlider.set(rounded);}
+        else
+        {$("#period-slider-value").text(secsToText(rounded));
+        $("#update-timeout-timeout").val(rounded);}
+        
     });
 
     var graceSlider = document.getElementById("grace-slider");
