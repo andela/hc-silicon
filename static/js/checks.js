@@ -1,5 +1,6 @@
 $(function () {
-
+    
+      
     var MINUTE = {name: "minute", nsecs: 60};
     var HOUR = {name: "hour", nsecs: MINUTE.nsecs * 60};
     var DAY = {name: "day", nsecs: HOUR.nsecs * 24};
@@ -36,19 +37,13 @@ $(function () {
         connect: "lower",
         range: {
             'min': [60, 60],
-            '27%': [3600, 3600],
-            '52%': [86400, 86400],
-            '64%': [604800, 604800],
-            '76%': [2592000, 2592000],
-            '80%': [2764800, 2764800],
-            '85%': [2937600, 2937600],
-            '90%': [3110400, 3110400],
-            '95%': [3283200, 3283200],
-            'max': 3456000,
+            '33%': [3600, 3600], 
+            '66%': [86400, 86400], 
+            'max': 2592000,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000, 3024001, 3456000],
+            values: [60, 1800, 3600, 43200, 86400, 1296000, 2592000],
             density: 4,
             format: {
                 to: secsToText,
@@ -62,7 +57,16 @@ $(function () {
         $("#period-slider-value").text(secsToText(rounded));
         $("#update-timeout-timeout").val(rounded);
     });
-
+    
+    periodSlider.noUiSlider.on("change", function (a, b, value) {
+        var rounded = Math.round(value);
+        if (value < 3600 * 24) { $("#days").val(1); }
+        else { $("#days").val(rounded / (3600 * 24)); }
+    });
+    $('#days').change(function () {
+        
+        periodSlider.noUiSlider.set(this.value * 3600 * 24);
+    });
 
     var graceSlider = document.getElementById("grace-slider");
     noUiSlider.create(graceSlider, {
@@ -70,19 +74,13 @@ $(function () {
         connect: "lower",
         range: {
             'min': [60, 60],
-            '27%': [3600, 3600],
-            '52%': [86400, 86400],
-            '64%': [604800, 604800],
-            '76%': [2592000, 2592000],
-            '80%': [2764800, 2764800],
-            '85%': [2937600, 2937600],
-            '90%': [3110400, 3110400],
-            '95%': [3283200, 3283200],
-            'max': 3456000,
+            '33%': [3600, 3600], 
+            '66%': [86400, 86400], 
+            'max': 2592000,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000, 3024001, 3456000],
+            values: [60, 1800, 3600, 43200, 86400, 1296000, 2592000],
             density: 4,
             format: {
                 to: secsToText,
@@ -97,20 +95,39 @@ $(function () {
         $("#update-timeout-grace").val(rounded);
     });
 
+    graceSlider.noUiSlider.on("change", function (a, b, value) {
+        var rounded = Math.round(value);
+        if (value < 3600 * 24) { $("#gracedays").val(1); }
+        else { $("#gracedays").val(rounded / (3600 * 24)); }
+    });
+
+    
+    $('#gracedays').change(function () {
+        
+        var rounded = this.value * 3600 * 24;
+        if (rounded <= 2592000)
+        {graceSlider.noUiSlider.set(rounded);}
+        else
+        
+        {$("#grace-slider-value").text(secsToText(rounded));
+        $("#update-timeout-grace").val(rounded);}
+        
+    });
+
+    
     var nagSlider = document.getElementById("nag-slider");
     noUiSlider.create(nagSlider, {
         start: [20],
         connect: "lower",
         range: {
             'min': [60, 60],
-            '33%': [3600, 3600],
-            '66%': [86400, 86400],
-            '83%': [604800, 604800],
+            '33%': [3600, 3600], 
+            '66%': [86400, 86400], 
             'max': 2592000,
         },
         pips: {
             mode: 'values',
-            values: [60, 1800, 3600, 43200, 86400, 604800, 2592000],
+            values: [60, 1800, 3600, 43200, 86400, 1296000, 2592000],
             density: 4,
             format: {
                 to: secsToText,
@@ -125,6 +142,24 @@ $(function () {
         $("#update-timeout-nag").val(rounded);
     });
 
+    nagSlider.noUiSlider.on("change", function (a, b, value) {
+        var rounded = Math.round(value);
+        if (value < 3600 * 24) { $("#nagdays").val(1); }
+        else { $("#nagdays").val(rounded / (3600 * 24)); }
+    });
+
+    
+    $('#nagdays').change(function () {
+        
+        var rounded = this.value * 3600 * 24;
+        if (rounded <= 2592000)
+        {nagSlider.noUiSlider.set(rounded);}
+        else
+        
+        {$("#nag-slider-value").text(secsToText(rounded));
+        $("#update-timeout-nag").val(rounded);}
+        
+    });
 
     $('[data-toggle="tooltip"]').tooltip();
 
