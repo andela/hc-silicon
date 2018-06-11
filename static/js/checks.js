@@ -61,16 +61,22 @@ $(function () {
     periodSlider.noUiSlider.on("change", function (a, b, value) {
         var rounded = Math.round(value);
         if (value < 3600 * 24) { $("#days").val(1); }
-        else { $("#days").val(rounded / (3600 * 24)); }
+        else { $("#days").val(rounded / (3600 * 24));
+        periodSlider.removeAttribute('disabled'); }
     });
     $('#days').change(function () {
         
         var rounded = this.value * 3600 * 24;
         if (rounded <= 2592000)
-        {periodSlider.noUiSlider.set(rounded);}
+        {
+            periodSlider.noUiSlider.set(rounded);
+            periodSlider.removeAttribute('disabled');
+        }
         else
-        {$("#period-slider-value").text(secsToText(rounded));
-        $("#update-timeout-timeout").val(rounded);}
+        {
+        $("#period-slider-value").text(secsToText(rounded));
+        $("#update-timeout-timeout").val(rounded);
+        periodSlider.setAttribute('disabled', true);}
         
     });
 
@@ -97,12 +103,14 @@ $(function () {
 
     graceSlider.noUiSlider.on("update", function(a, b, value) {
         var rounded = Math.round(value);
+        graceSlider.removeAttribute('disabled');
         $("#grace-slider-value").text(secsToText(rounded));
         $("#update-timeout-grace").val(rounded);
     });
 
     graceSlider.noUiSlider.on("change", function (a, b, value) {
         var rounded = Math.round(value);
+        graceSlider.removeAttribute('disabled');
         if (value < 3600 * 24) { $("#gracedays").val(1); }
         else { $("#gracedays").val(rounded / (3600 * 24)); }
     });
@@ -116,7 +124,9 @@ $(function () {
         else
         
         {$("#grace-slider-value").text(secsToText(rounded));
-        $("#update-timeout-grace").val(rounded);}
+        $("#update-timeout-grace").val(rounded);
+        graceSlider.setAttribute('disabled', true);}
+        
         
     });
 
@@ -144,12 +154,14 @@ $(function () {
 
     nagSlider.noUiSlider.on("update", function(a, b, value) {
         var rounded = Math.round(value);
+        nagSlider.removeAttribute('disabled');
         $("#nag-slider-value").text(secsToText(rounded));
         $("#update-timeout-nag").val(rounded);
     });
 
     nagSlider.noUiSlider.on("change", function (a, b, value) {
         var rounded = Math.round(value);
+        nagSlider.removeAttribute('disabled');
         if (value < 3600 * 24) { $("#nagdays").val(1); }
         else { $("#nagdays").val(rounded / (3600 * 24)); }
     });
@@ -163,7 +175,9 @@ $(function () {
         else
         
         {$("#nag-slider-value").text(secsToText(rounded));
-        $("#update-timeout-nag").val(rounded);}
+        $("#update-timeout-nag").val(rounded);
+        nagSlider.setAttribute('disabled', true);}
+        
         
     });
 
