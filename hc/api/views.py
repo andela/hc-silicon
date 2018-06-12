@@ -71,6 +71,7 @@ def checks(request):
         check = Check(user=request.user)
         check.name = str(request.json.get("name", ""))
         check.tags = str(request.json.get("tags", ""))
+        check.priority = str(request.json.get("priority", ""))
         if "timeout" in request.json:
             check.timeout = td(seconds=request.json["timeout"])
         if "grace" in request.json:
