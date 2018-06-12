@@ -54,6 +54,7 @@ class Check(models.Model):
     nag_after = models.DateTimeField(null=True, blank=True, editable=False)
     nag_status = models.BooleanField(default=False)
     n_pings = models.IntegerField(default=0)
+    priority = models.IntegerField(default=0)
     last_ping = models.DateTimeField(null=True, blank=True)
     alert_after = models.DateTimeField(null=True, blank=True, editable=False)
     status = models.CharField(max_length=9, choices=STATUSES, default="new")
