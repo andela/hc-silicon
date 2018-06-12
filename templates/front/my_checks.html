@@ -110,6 +110,64 @@
     </div>
 </div>
 
+
+<div id="update-priority-modal" class="modal">
+    
+    <div class="modal-dialog">
+        
+        <form id="update-priority-form" class="form-horizontal" method="post">
+            {% csrf_token %}
+            
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="update-priority-title">Check Priority</h4>
+                </div>
+                
+                
+                <div class="modal-body">
+                    
+                    <div class="form-group">
+                        <label for="update-priority-input" class="col-sm-2 control-label">
+                            Priority
+                        </label>
+                        
+                        <div class="col-sm-9">
+                            
+                            <select id="update-priority-input"   value="yeeeei" name="priority" type="text" placeholder="unnamed"
+                                class="input-priority form-control">
+                                <option value=1>High Priority</option>
+                                <option value=0>Medium Priority</option>
+                                <option value=-1>Low Priority</option>
+                            </select> 
+               
+                            <span class="help-block"><br />
+                                Give this check a relevant priority depending on how critical it is. i.e High, medium or low priority
+                            </span>
+                        </div>
+                        
+                        
+                    </div>
+                    
+
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                
+            </div>
+            
+        </form>
+        
+    </div>
+    
+</div>
+
+
+
 <div id="update-timeout-modal" class="modal">
     <div class="modal-dialog">
         <form id="update-timeout-form" method="post">
