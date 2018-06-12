@@ -24,6 +24,9 @@ class TimeoutForm(forms.Form):
     nag = forms.IntegerField(min_value=60)
 
 
+class PriorityForm(forms.Form):
+    priority = forms.IntegerField(required=True)
+
 
 class AddChannelForm(forms.ModelForm):
 
