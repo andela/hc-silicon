@@ -195,6 +195,17 @@ $(function () {
         return false;
     });
 
+    $(".my-checks-priority").click(function() {
+        var $this = $(this);
+
+        $("#update-priority-form").attr("action", $this.data("url"));
+        $("#update-priority-input").val($this.data("priority"));
+        $('#update-priority-modal').modal("show");
+        $("#update-priority-input").focus();
+
+        return false;
+    });
+    
     $(".timeout-grace").click(function() {
         var $this = $(this);
 
