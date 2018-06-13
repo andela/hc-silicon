@@ -89,6 +89,7 @@
                 href="#"
                 data-url="{% url 'hc-update-timeout' check.code %}"
                 data-timeout="{{ check.timeout.total_seconds }}"
+                data-nag="{{ check.nag.total_seconds }}"
                 data-grace="{{ check.grace.total_seconds }}"
                 class="btn btn-default timeout-grace">Change Period</a>
 

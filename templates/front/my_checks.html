@@ -167,7 +167,6 @@
 </div>
 
 
-
 <div id="update-timeout-modal" class="modal">
     <div class="modal-dialog">
         <form id="update-timeout-form" method="post">
@@ -191,9 +190,9 @@
                         </span>
                     </div>
                     <div id="manual-slider">
-                        {% for check in checks %}
+                        
                         Timeout Days: <input type="number" min="1" id="days" class="days" value= {{check.timeout}} >
-                        {% endfor %}
+                        
                     </div>
                     <div id="period-slider"></div>
 
@@ -212,9 +211,9 @@
                     </div>
 
                     <div id="manual-slider">
-                        {% for check in checks %}
+                        
                         Grace Days: <input type="number" min="1" id="gracedays" class="days" value= {{check.grace}}>
-                        {% endfor %}
+                        
                     </div>
 
                     <div id="grace-slider"></div>
