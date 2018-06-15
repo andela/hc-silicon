@@ -23,14 +23,18 @@
 
 }
 
-#period-slider {
+#period-slider, #escalation-slider  {
     margin: 20px 50px 80px 50px;
 }
 
-#period-slider.noUi-connect {
+#period-slider.noUi-connect, {
   background: #22bc66;
 }
 
+#escalation-slider.noUi-connect, {
+    background: #bc2222;
+  }
+  
 #grace-slider {
     margin: 20px 50px 110px 50px;
 }
@@ -47,7 +51,7 @@
   background: #e646b0;
 }
 
-#period-slider .noUi-value, #grace-slider .noUi-value #nag-slider .noUi-value{
+#period-slider .noUi-value, #grace-slider .noUi-value, #nag-slider .noUi-value, #escalation-slider .noUi-value{
     width: 60px;
     margin-left: -30px;
 }

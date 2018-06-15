@@ -21,7 +21,7 @@ def ping(request, code):
         check = Check.objects.get(code=code)
     except Check.DoesNotExist:
         return HttpResponseBadRequest()
-
+   
     if check.status in ("new", "paused"):
         check.status = "up"
 
