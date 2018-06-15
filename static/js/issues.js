@@ -55,6 +55,22 @@ $(function () {
         return false;
     });
 
+
+    // Escallation
+
+    $(".my-checks-escalation").click(function() {
+        var $this = $(this);
+
+        $("#update-escalation-form").attr("action", $this.data("url"));
+        $("#update-escalation-input").val($this.data("escalation_list"));
+        $('#update-escalation-modal').modal("show");
+        $("#update-escalation-input").focus();
+
+        return false;
+    });
+
+    // End Escalation
+
     $(".check-menu-remove").click(function () {
         var $this = $(this);
 
