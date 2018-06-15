@@ -57,12 +57,10 @@
             </button>
         </td>
 
-        <td class="priority-cell">
-            <div data-name="{{ check.priority }}"
-                    data-tags="{{ check.tags }}"
+        <td class="priority-cell" >
+            <div data-priority="{{ check.priority }}"
                     data-url="{% url 'hc-update-priority' check.code %}"
-                    class="my-checks-priority {% if not check.priority %}unnamed{% endif %}"
-                    >
+                    class="my-checks-priority {% if not check.priority %}unnamed{% endif %}">
      
                 {% for tag in check.tags_list %}
                     <span class="label label-tag">{{ tag }}</span>
@@ -70,17 +68,17 @@
                 {% endfor %}
                 {% if check.priority > 0 %}
                 <span class="label label label-danger" id="{{ check.priority }}">
-                    High priority
+                    High
                 </span>
                 {% endif %}
                 {% if check.priority == 0 %}
                 <span class="label label label-warning" id="{{ check.priority }}">
-                    Medium priority
+                    Normal
                 </span>
                 {% endif %}
                 {% if check.priority < 0 %}
                 <span class="label label label-info" id="{{ check.priority }}">
-                    Low priority
+                    Low
                 </span>
                 {% endif %}
             </div>
@@ -128,6 +126,25 @@
                         </a>
                     </li>
                     <li role="separator" class="divider"></li>
+
+                    <!-- Alert escallation -->
+
+                    
+                    <li {% if check.priority <= 0 %} style="pointer-events:none; opacity:0.6;" {% endif %}>
+                        <a data-escalation_list="{{ check.escalation_list }}"
+                            class="my-checks-escalation {% if not check.scalation_list %}unnamed{% endif %}"
+                           href="#"
+                           data-escalation_interval="{{ check.escalation_interval.total_seconds }}"
+                           data-url="{% url 'hc-update-escalation' check.code %}">
+                           
+                           Alert Escallation
+                        </a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+
+                    <!-- End Alert escallation -->
+
+
                     <li>
                         <a href="{% url 'hc-log' check.code %}">
                             Log

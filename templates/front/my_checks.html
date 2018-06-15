@@ -58,7 +58,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="update-timeout-title">Name and Tags</h4>
+                    <h4 class="update-timeout-title"></h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -135,15 +135,16 @@
                         
                         <div class="col-sm-9">
                             
-                            <select id="update-priority-input"   value="yeeeei" name="priority" type="text" placeholder="unnamed"
+                            <!-- <input type="text" value= {{check.priority}}> -->
+                            
+                            <select id="update-priority-input"   value="{{check.priority}}" name="priority" type="text" placeholder="unnamed"
                                 class="input-priority form-control">
-                                <option value=1>High Priority</option>
-                                <option value=0>Medium Priority</option>
-                                <option value=-1>Low Priority</option>
+                                <option value=1>High</option>
+                                <option value=0>Normal</option>
+                                <option value=-1>Low</option>
                             </select> 
-               
                             <span class="help-block"><br />
-                                Give this check a relevant priority depending on how critical it is. i.e High, medium or low priority
+                                Give this check a relevant priority depending on how critical it is. i.e High, Normal or Low priority
                             </span>
                         </div>
                         
@@ -166,6 +167,72 @@
     
 </div>
 
+<!-- Update escalation modal -->
+
+<div id="update-escalation-modal" class="modal">
+        <div class="modal-dialog">
+            <form id="update-escalation-form" class="form-horizontal" method="post">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="update-timeout-title"> Alert Escalation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="update-escalation-input" class="col-sm-2 control-label" style="text-align: left">
+                               Emails
+                            </label><br><br>
+
+                            <div style="width:90%; margin-left:5%;text-align: left !important">
+                                <input
+                                value="{{check.escalation_list}}"
+                                    id="update-escalation-input"
+                                    name="escalation_list"
+                                    type="text"
+                                    placeholder="unnamed"
+                                    class="form-control"/>
+    
+                                <span class="help-block">
+                                    <br>
+                                    Add emails which alerts need to be escallated to if the check owner takes time to correct faults causing th check to fail.
+                                    Seperate the multiple emails using a semicollon - (;)
+                                </span>
+                            </div>
+                        </div>
+    
+                        <div class="form-group">
+                            <label for="update-tags-input" class="col-sm-4 control-label" style="text-align: left">
+                                Period
+                                <span
+                                    id="escalation-slider-value">
+                                    1 day
+                                </span>
+
+                            </label>
+                            <br><br>
+                            <div id="escalation-slider">
+                            <input type="hidden" id="update-timeout-escalation" name="escalation_interval">
+                            
+                            </div>
+                            <div style="width:90%; margin-left:5%;">
+                            <span class="help-block">
+                                    Add duration it should take before alert is escalated to more users after a check has gone down
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+<!-- End update escalation modal -->
 
 <div id="update-timeout-modal" class="modal">
     <div class="modal-dialog">
