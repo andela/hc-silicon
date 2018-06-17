@@ -12,6 +12,9 @@
             My Checks
         {% else %}
             {{ request.team.team_name }}
+            {% if department.name %}
+                / {{ department }}
+            {% endif %}
         {% endif %}
         </h1>
     </div>

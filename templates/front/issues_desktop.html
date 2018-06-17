@@ -9,7 +9,11 @@
     {% for check in checks %}
     <tr class="checks-row">
         <td class="indicator-cell">
-          <span class="status icon-down"></span>
+            {% if check.in_nag_period == "nag" and check.get_status == "down"%}
+                <span class="status icon-nag"></span>
+            {% elif check.get_status == "down" %}
+                <span class="status icon-down"></span>
+            {% endif %}
         </td>
         <td class="name-cell">
             <div data-name="{{ check.name }}"

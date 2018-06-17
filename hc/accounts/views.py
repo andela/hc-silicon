@@ -18,7 +18,7 @@ from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm, ReportsForm)
-from hc.accounts.models import Profile, Member
+from hc.accounts.models import Profile, Member, Department
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
 
@@ -172,12 +172,20 @@ def profile(request):
             if form.is_valid():
 
                 email = form.cleaned_data["email"]
+                dept_name = form.cleaned_data["department"]
                 try:
                     user = User.objects.get(email=email)
                 except User.DoesNotExist:
                     user = _make_user(email)
-
-                profile.invite(user)
+                if dept_name != None:
+                    try:
+                        department = Department.objects.get(name=dept_name, team=request.user.profile)
+                    except Department.DoesNotExist:
+                        department = Department(name=dept_name, team=request.user.profile)
+                        department.save()
+                else:
+                    department=None
+                profile.invite(user, department)
                 messages.success(request, "Invitation to %s sent!" % email)
         elif "remove_team_member" in request.POST:
             form = RemoveTeamMemberForm(request.POST)
@@ -213,14 +221,20 @@ def profile(request):
             continue
 
         badge_urls.append(get_badge_url(username, tag))
+    members = list()
+    if profile.member_set.count:
+        for member in profile.member_set.all():
+            memb = member
+            setattr(memb, 'department', profile.department(member.user))
+            members.append(memb)
 
     ctx = {
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
+        "members": members,
         "show_api_key": show_api_key
     }
-    print(profile.reports_frequency)
 
     return render(request, "accounts/profile.html", ctx)
 

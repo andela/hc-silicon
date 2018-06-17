@@ -87,25 +87,51 @@
         <div class="panel panel-default">
             <div class="panel-body settings-block">
                 <h2>Team Access</h2>
-                {% if profile.member_set.count %}
+                {% if members|length %}
                     <table class="table">
-                        <tr>
-                            <td>{{ profile.user.email }}</td>
-                            <td>Owner</td>
-                            <td></td>
-                        </tr>
-                        {% for member in profile.member_set.all %}
-                        <tr>
-                            <td>{{ member.user.email }} </td>
-                            <td>Member</td>
-                            <td>
-                                <a
-                                    href="#"
-                                    data-email="{{ member.user.email }}"
-                                    class="pull-right member-remove">Remove</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                        <thead>
+                            <tr class="small">
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    Membership
+                                </th>
+                                <th>
+                                    Department
+                                </td>
+                                <th class="text-center">
+                                    Revoke
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ profile.user.email }}</td>
+                                <td>Owner</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            {% for member in members%}
+                            <tr>
+                                <td>{{ member.user.email }} </td>
+                                <td>Member</td>
+                                <td>
+                                    {% if member.department.name %}
+                                        {{ member.department }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a
+                                        href="#"
+                                        data-email="{{ member.user.email }}"
+                                        class="pull-right member-remove">Remove</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 {% else %}
                     <p>
@@ -294,6 +320,16 @@
                                 id="itm-email"
                                 name="email"
                                 placeholder="friend@example.org">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="itm-email" class="col-sm-2 control-label">Department</label>
+                        <div class="col-sm-9">
+                            <input
+                                type="department"
+                                class="form-control"
+                                name="department"
+                                placeholder="Department...">
                         </div>
                     </div>
                 </div>

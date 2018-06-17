@@ -41,6 +41,13 @@ class Profile(models.Model):
         }
         emails.login(self.user.email, ctx)
 
+    def department(self,user):
+        try:
+            member = Member.objects.get(team=self, user=user)
+            return member.department
+        except Member.DoesNotExist:
+            return None
+
     def send_set_password_link(self):
         token = str(uuid.uuid4())
         self.token = make_password(token)
@@ -87,10 +94,10 @@ class Profile(models.Model):
 
         emails.report(self.user.email, ctx)
 
-    def invite(self, user):
-        member = Member(team=self, user=user)
+    def invite(self, user, department):
+        member = Member(team=self, user=user, department=department)
         member.save()
-
+        
         # Switch the invited user over to the new team so they
         # notice the new team on next visit:
         user.profile.current_team = self
@@ -99,6 +106,15 @@ class Profile(models.Model):
         user.profile.send_instant_login_link(self)
 
 
+
+class Department(models.Model):
+    team = models.ForeignKey(Profile)
+    name = models.CharField(max_length=128, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+
 class Member(models.Model):
     team = models.ForeignKey(Profile)
     user = models.ForeignKey(User)
+    department = models.ForeignKey(Department)

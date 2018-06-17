@@ -77,3 +77,6 @@ body {
 .dialog-body {
     margin: 24px 0;
 }
+.label-nag{
+    background-color: #e646b0;
+}
