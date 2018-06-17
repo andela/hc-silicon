@@ -108,15 +108,13 @@
                         <tbody>
                             <tr>
                                 <td>{{ profile.user.email }}</td>
-                                <td>Owner</td>
-                                <td></td>
-                                <td></td>
+                                <td colspan="3">Owner</td>
                             </tr>
                             {% for member in members%}
                             <tr>
                                 <td>{{ member.user.email }} </td>
                                 <td>Member</td>
-                                <td>
+                                <td class="text-center">
                                     {% if member.department.name %}
                                         {{ member.department }}
                                     {% else %}
