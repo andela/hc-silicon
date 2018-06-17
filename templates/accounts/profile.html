@@ -182,6 +182,50 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-sm-6">
+        <div class="panel panel-default">
+            <div class="panel-body settings-block">
+                <form method="post" id="alert_mode_form">
+                    {% csrf_token %}
+                    <h2>Alerts</h2>
+                    <label class="radiobtn">
+                        <input
+                            name="alert_mode"
+                            type="radio"
+                            value="Email"
+                            {% if profile.alert_mode == "Email" %} checked {% endif %}>
+                        Email
+                    </label>
+                    <label class="radiobtn">
+                        <input
+                            name="alert_mode"
+                            type="radio"
+                            value="Phone"
+                            {% if profile.alert_mode == "Phone" %} checked {% endif %}>
+                        Phone
+                    </label>
+                    <div class="form-group">
+                            <label>Phone</label>
+                            <input
+                            name="phone"
+                            type="text"
+                            class="form-control"
+                            placeholder="Phone No"
+                            id="phone_number"
+                            value={% if profile.alert_mode == "Phone" %} {{ profile.phone_number }} {% endif %}>
+                        <input type="hidden" name="phone_number" id="full_phone_number"/>
+                    </div>
+                    <button
+                        name="update_alert_mode"
+                        type="submit"
+                        class="btn btn-default pull-right">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 {% if badge_urls %}
 <div class="row">
     <div class="col-sm-12">
@@ -348,6 +392,21 @@
 {% compress js %}
 <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/intlTelInput.min.js' %}"></script>
 <script src="{% static 'js/profile.js' %}"></script>
+<script>
+    $("#phone_number").intlTelInput({
+        allowDropdown: true,
+        formatOnDisplay: false,
+        hiddenInput: "full_phone_number",
+        initialCountry: "auto",
+        preferredCountries: ['ke', 'rw', 'ng', 'ug', 'us', 'de', 'sa', 'fr'],
+        separateDialCode: true,
+        utilsScript: "{% static 'js/utils.js' %}"
+    });
+    $("#alert_mode_form").submit(function() {
+        $("#full_phone_number").val($("#phone_number").intlTelInput("getNumber"));
+    });
+</script>
 {% endcompress %}
 {% endblock %}
