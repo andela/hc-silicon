@@ -179,7 +179,7 @@ def profile(request):
                     user = _make_user(email)
                 if dept_name != None:
                     try:
-                        department = Department.objects.get(name=dept_name, team=request.user.profile)
+                        department = Department.objects.get(name__iexact=dept_name, team=request.user.profile)
                     except Department.DoesNotExist:
                         department = Department(name=dept_name, team=request.user.profile)
                         department.save()
