@@ -6,10 +6,16 @@ class LogTestCase(BaseTestCase):
 
     def setUp(self):
         super(LogTestCase, self).setUp()
-        self.check = Check(user=self.alice)
+        self.check = Check(user=self.alice, department=self.department)
         self.check.save()
 
+        # Create an another check with different department
+        self.check_dep = Check(user=self.alice, department=None)
+        self.check_dep.save()
+
         ping = Ping(owner=self.check)
+        ping.save()
+        ping = Ping(owner=self.check_dep)
         ping.save()
 
     def test_it_works(self):
@@ -42,6 +48,12 @@ class LogTestCase(BaseTestCase):
         self.client.login(username="alice@example.org", password="password")
         r = self.client.get(url)
         assert r.status_code == 404
+
+    def test_it_checks_by_dept(self):
+        url = "/checks/%s/log/" % self.check_dep.code
+        self.client.login(username="bob@example.org", password="password")
+        r = self.client.get(url)
+        assert r.status_code == 403
 
     def test_it_checks_ownership(self):
         url = "/checks/%s/log/" % self.check.code

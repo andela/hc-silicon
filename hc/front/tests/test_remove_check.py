@@ -6,8 +6,12 @@ class RemoveCheckTestCase(BaseTestCase):
 
     def setUp(self):
         super(RemoveCheckTestCase, self).setUp()
-        self.check = Check(user=self.alice)
+        self.check = Check(user=self.alice, department=self.department)
         self.check.save()
+
+        # Create an another check with different department (2 checks in DB)
+        self.check_dep = Check(user=self.alice, department=None)
+        self.check_dep.save()
 
     def test_it_works(self):
         url = "/checks/%s/remove/" % self.check.code
@@ -16,7 +20,8 @@ class RemoveCheckTestCase(BaseTestCase):
         r = self.client.post(url)
         self.assertRedirects(r, "/checks/")
 
-        assert Check.objects.count() == 0
+        # 2 checks minus deleted one we'll left with 1
+        assert Check.objects.count() == 1
 
     def test_team_access_works(self):
         url = "/checks/%s/remove/" % self.check.code
@@ -25,7 +30,16 @@ class RemoveCheckTestCase(BaseTestCase):
         # should work.
         self.client.login(username="bob@example.org", password="password")
         self.client.post(url)
-        assert Check.objects.count() == 0
+        # 2 checks minus deleted one we'll left with 1
+        assert Check.objects.count() == 1
+    
+    def test_team_dept_access_works(self):
+        url = "/checks/%s/remove/" % self.check_dep.code
+
+        # log in bob
+        self.client.login(username="bob@example.org", password="password")
+        r = self.client.post(url)
+        self.assertEqual(r.status_code, 403)
 
     def test_it_handles_bad_uuid(self):
         url = "/checks/not-uuid/remove/"

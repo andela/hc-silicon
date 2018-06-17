@@ -6,8 +6,12 @@ class UpdateTimeoutTestCase(BaseTestCase):
 
     def setUp(self):
         super(UpdateTimeoutTestCase, self).setUp()
-        self.check = Check(user=self.alice)
+        self.check = Check(user=self.alice, department=self.department)
         self.check.save()
+
+        # Create an another check with different department
+        self.check_dep = Check(user=self.alice, department=None)
+        self.check_dep.save()
 
     def test_it_works(self):
         url = "/checks/%s/timeout/" % self.check.code
@@ -46,6 +50,14 @@ class UpdateTimeoutTestCase(BaseTestCase):
 
         check = Check.objects.get(code=self.check.code)
         assert check.timeout.total_seconds() == 7200
+
+    def test_it_dept_works(self):
+        url = "/checks/%s/timeout/" % self.check_dep.code
+        payload = {"timeout": 3600, "grace": 60, "nag": 60}
+
+        self.client.login(username="bob@example.org", password="password")
+        r = self.client.post(url, data=payload)
+        self.assertEqual(r.status_code, 403)
 
     def test_it_handles_bad_uuid(self):
         url = "/checks/not-uuid/timeout/"

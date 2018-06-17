@@ -154,8 +154,10 @@ def update_name(request, code):
     if request.team.user.id != request.user.id:
         member = Member.objects.get(team=request.team,user=request.user)
         dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
     
-    if (check.user_id != request.team.user.id or check.department != dept):
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
     
     form = NameTagsForm(request.POST)
@@ -177,8 +179,10 @@ def update_timeout(request, code):
     if request.team.user.id != request.user.id:
         member = Member.objects.get(team=request.team,user=request.user)
         dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
     
-    if (check.user_id != request.team.user.id or check.department != dept):
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     form = TimeoutForm(request.POST)
@@ -201,8 +205,10 @@ def pause(request, code):
     if request.team.user.id != request.user.id:
         member = Member.objects.get(team=request.team,user=request.user)
         dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
     
-    if (check.user_id != request.team.user.id or check.department != dept):
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     check.status = "paused"
@@ -221,8 +227,10 @@ def remove_check(request, code):
     if request.team.user.id != request.user.id:
         member = Member.objects.get(team=request.team,user=request.user)
         dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
     
-    if (check.user_id != request.team.user.id or check.department != dept):
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     check.delete()

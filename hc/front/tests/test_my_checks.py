@@ -8,7 +8,11 @@ class MyChecksTestCase(BaseTestCase):
 
     def setUp(self):
         super(MyChecksTestCase, self).setUp()
-        self.check = Check(user=self.alice, name="Alice Was Here")
+        self.check = Check(user=self.alice, name="Alice Was Here", department=self.department)
+        self.check.save()
+
+        # Add another check with different department
+        self.check = Check(user=self.alice, name="Only owner", department=None)
         self.check.save()
 
     def test_it_works(self):
@@ -16,6 +20,12 @@ class MyChecksTestCase(BaseTestCase):
             self.client.login(username=email, password="password")
             r = self.client.get("/checks/")
             self.assertContains(r, "Alice Was Here", status_code=200)
+    
+    def test_it_checks_depart_works(self):
+        self.client.login(username='bob@example.org', password="password")
+        r = self.client.get("/checks/")
+        self.assertEqual(r.status_code, 200)
+        self.assertNotContains(r, "Only owner")
 
     def test_it_shows_green_check(self):
         self.check.last_ping = timezone.now()
@@ -40,10 +50,10 @@ class MyChecksTestCase(BaseTestCase):
         r = self.client.get("/checks/")
 
         # Desktop
-        self.assertContains(r, "icon-down")
+        self.assertContains(r, "icon-nag")
 
         # Mobile
-        self.assertContains(r, "label-danger")
+        self.assertContains(r, "label-nag")
 
     def test_it_shows_amber_check(self):
         self.check.last_ping = timezone.now() - td(days=1, minutes=30)
