@@ -57,6 +57,9 @@ class Check(models.Model):
     last_ping = models.DateTimeField(null=True, blank=True)
     alert_after = models.DateTimeField(null=True, blank=True, editable=False)
     status = models.CharField(max_length=9, choices=STATUSES, default="new")
+    is_alerted = models.BooleanField(default=False)
+    member_allowed_access = models.BooleanField(default=False)
+    member_allowed_id = models.IntegerField(default=0)
 
     def name_then_code(self):
         if self.name:
