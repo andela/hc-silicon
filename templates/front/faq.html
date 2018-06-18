@@ -21,7 +21,7 @@
                     </div>
                     <div id="collapseOne" class="panel-collapse collapse in">
                         <div class="panel-body">
-                            Want to create a check? It is very simple. Once you are logged in, click the green button 
+                            Want to create a check? It is very simple. Once you are <a href="{% url 'hc-login' %}">logged in</a>, click the green button 
                             labelled "Add Check". You have your check created!
                         </div>
                     </div>
@@ -37,10 +37,11 @@
                     <div id="collapseTwo" class="panel-collapse collapse">
                         <div class="panel-body">
                             Inviting someone or team member(s) to your check is premium feature. To the top right, 
-                            click on your email to reveal a drop down. Select "Account Settings". Under "Team Access", 
-                            upgrade your account by clicking "paid plans" link. Once you have subcribed to one of the 
-                            plans, just click "Invite a Team Member". Add the team member's email and click send invite. 
-                            The member will receive an invite and once accepted, will become a team member.
+                            click on your email to reveal a drop down. Select <a href="{% url 'hc-profile' %}">Account 
+                            Settings</a>. Under "Team Access", upgrade your account by clicking "paid plans" link. Once 
+                            you have subcribed to one of the plans, just click "Invite a Team Member". Add the team 
+                            member's email and click send invite. The member will receive an invite and once accepted, 
+                            will become a team member.
                         </div>
                     </div>
                 </div>
@@ -85,8 +86,8 @@
                     </div>
                     <div id="collapseFive" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Yes! To the top right, click on your email to reveal a drop down. Select "Account Settings". 
-                            Under Reports in Settings, select one of the options that suits you best. It is that simple!
+                            Yes! To the top right, click on your email to reveal a drop down. Select <a href="{% url 'hc-profile' %}">Account 
+                            Settings</a>. Under Reports in Settings, select one of the options that suits you best. It is that simple!
                         </div>
                     </div>
                 </div>
@@ -100,7 +101,7 @@
                     </div>
                     <div id="collapseSix" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Integrations? Quite a number are available. On the Home page, click the Integrations tab to 
+                            Integrations? Quite a number are available. On the Home page, click the <a href="{% url 'hc-channels' %}">Integrations</a> tab to 
                             reveal six listed ones. Click on any of them and follow the guidance to set it up. 
                         </div>
                     </div>
@@ -115,7 +116,7 @@
                     </div>
                     <div id="collapseSeven" class="panel-collapse collapse">
                         <div class="panel-body">
-                            On the Home page, click the Issues tab to reveal unresolved checks. Easy, isn't it?
+                            On the <a href="{% url 'hc-index' %}">Home</a> page, click the Issues tab to reveal unresolved checks. Easy, isn't it?
                         </div>
                     </div>
                 </div>
@@ -162,7 +163,7 @@
                     <div id="collapseTen" class="panel-collapse collapse">
                         <div class="panel-body">
                             In case you want to see a summary of your checks' report, go to the top right and click on 
-                            your email to reveal a drop down. Select "Check Reports". You will see your report there.
+                            your email to reveal a drop down. Select <a href="{% url 'hc-reports' %}">Check Reports</a>. You will see your report there.
                         </div>
                     </div>
                 </div>
