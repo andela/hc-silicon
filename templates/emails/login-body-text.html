@@ -1,6 +1,6 @@
 {% block content %}Hello,
 {% if inviting_profile %}
-{{ inviting_profile }}, {{ department }} department invites you to their healthchecks.io account.
+{{ inviting_profile }}{% if department %}, {{ department }} department{% endif %} invites you to their healthchecks.io account.
 
 You will be able to manage their existing monitoring checks and set up new
 ones. If you already have your own account on healthchecks.io, you will
