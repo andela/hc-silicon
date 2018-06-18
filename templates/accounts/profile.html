@@ -189,6 +189,7 @@
                 <form method="post" id="alert_mode_form">
                     {% csrf_token %}
                     <h2>Alerts</h2>
+                    <p>Set your preferred alert mode:</p>
                     <label class="radiobtn">
                         <input
                             name="alert_mode"
@@ -203,7 +204,7 @@
                             type="radio"
                             value="Phone"
                             {% if profile.alert_mode == "Phone" %} checked {% endif %}>
-                        Phone
+                        SMS
                     </label>
                     <div class="form-group">
                             <label>Phone</label>

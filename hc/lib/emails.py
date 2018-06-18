@@ -22,8 +22,9 @@ def alert(to, ctx):
     user = User.objects.get(email=to)
     if user.profile.alert_mode == "Phone":
         to = [user.profile.phone_number]
-        sms_body = "The check {} is running {}".format(
-            ctx['check'].name_then_code(), ctx['check'].status)
+        verb = "is running" if ctx['check'].status =="too often" else "is"
+        sms_body = "The check {} {} {}".format(
+            ctx['check'].name_then_code(), verb, ctx['check'].status)
         send_sms(to, sms_body)
     send("alert", to, ctx)
 
