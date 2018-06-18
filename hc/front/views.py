@@ -1,6 +1,8 @@
 from collections import Counter
 from datetime import timedelta as td
 from itertools import tee
+import re
+from django.core.validators import validate_email
 
 import requests
 from django.conf import settings
@@ -17,7 +19,8 @@ from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
                             TimeoutForm)
-
+from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 
 # from itertools recipes:
 def pairwise(iterable):
@@ -179,7 +182,18 @@ def update_escalation(request, code):
     form = EscalationForm(request.POST)
 
     if form.is_valid():
-        check.escalation_list = form.cleaned_data["escalation_list"]
+        e_list = form.cleaned_data["escalation_list"]
+
+        SEPARATOR_RE = re.compile(r'[;]+')
+        emails = SEPARATOR_RE.split(e_list)
+        valid_emails = list()
+        for email in emails:
+            try:
+                validate_email(email)
+                valid_emails.append(email)
+            except:
+                messages.warning(request, "Invalid Email, kindly fill in a valid email format i.e kzy@gmail.com and seperate each email by a semicollon")
+        check.escalation_list = ';'.join(map(str, valid_emails))
         check.escalation_interval = td(seconds=form.cleaned_data["escalation_interval"])
         check.save()
 
@@ -497,7 +511,7 @@ def add_pushbullet(request):
             messages.success(request,
                              "The Pushbullet integration has been added!")
         else:
-            messages.warning(request, "Something went wrong")
+            messages.debug(request, "Something went wrong")
 
         return redirect("hc-channels")
 
