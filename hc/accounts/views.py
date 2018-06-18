@@ -185,8 +185,14 @@ def profile(request):
                         department.save()
                 else:
                     department=None
-                profile.invite(user, department)
-                messages.success(request, "Invitation to %s sent!" % email)
+                try:
+                    member = Member.objects.get(team=request.team,user=user)
+                    member.department = department
+                    member.save()
+                    messages.success(request, "%s already exists in your team, department has been updated instead" % email)
+                except Member.DoesNotExist:
+                    profile.invite(user, department)
+                    messages.success(request, "Invitation to %s sent!" % email)
         elif "remove_team_member" in request.POST:
             form = RemoveTeamMemberForm(request.POST)
             if form.is_valid():

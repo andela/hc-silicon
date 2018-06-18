@@ -29,15 +29,16 @@ class Profile(models.Model):
     def __str__(self):
         return self.team_name or self.user.email
 
-    def send_instant_login_link(self, inviting_profile=None):
+    def send_instant_login_link(self, inviting_profile=None, department=None):
         token = str(uuid.uuid4())
         self.token = make_password(token)
         self.save()
-
+        
         path = reverse("hc-check-token", args=[self.user.username, token])
         ctx = {
             "login_link": settings.SITE_ROOT + path,
-            "inviting_profile": inviting_profile
+            "inviting_profile": inviting_profile,
+            "department": department
         }
         emails.login(self.user.email, ctx)
 
@@ -102,8 +103,9 @@ class Profile(models.Model):
         # notice the new team on next visit:
         user.profile.current_team = self
         user.profile.save()
-
-        user.profile.send_instant_login_link(self)
+        if department != None:
+            department = department.name
+        user.profile.send_instant_login_link(self,department=department)
 
 
 
