@@ -205,7 +205,6 @@ def profile(request):
 
         elif "member_priority" in request.POST:
             form = UpdateTeamMemberPriority(request.POST)
-
             if form.is_valid():
                 user_email = form.cleaned_data["email"]
                 user = User.objects.get(email=user_email)
@@ -213,6 +212,8 @@ def profile(request):
 
                 if get_user.priority == "LOW":
                     get_user.priority = "HIGH"
+                    get_user.save()
+                    messages.success(request, "Your priority changed.")
                 else:
                     get_user.priority = "LOW"
                     get_user.save()
