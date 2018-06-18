@@ -1,6 +1,8 @@
 from collections import Counter
 from datetime import timedelta as td
 from itertools import tee
+import re
+from django.core.validators import validate_email
 
 import requests
 from django.conf import settings
@@ -15,9 +17,10 @@ from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
-from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm,
+from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
                             TimeoutForm)
-
+from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 
 # from itertools recipes:
 def pairwise(iterable):
@@ -29,7 +32,7 @@ def pairwise(iterable):
 
 @login_required
 def my_checks(request):
-    q = Check.objects.filter(user=request.team.user).order_by("created")
+    q = Check.objects.filter(user=request.team.user).order_by("priority").reverse()
     checks = list(q)
 
     counter = Counter()
@@ -146,6 +149,52 @@ def update_name(request, code):
     if form.is_valid():
         check.name = form.cleaned_data["name"]
         check.tags = form.cleaned_data["tags"]
+        check.save()
+
+    return redirect("hc-checks")
+
+@login_required
+@uuid_or_400
+def update_priority(request, code):
+    assert request.method == "POST"
+
+    check = get_object_or_404(Check, code=code)
+    if check.user_id != request.team.user.id:
+        return HttpResponseForbidden()
+
+    form = PriorityForm(request.POST)
+    if form.is_valid():
+        check.priority = form.cleaned_data["priority"]
+        # check.tags = form.cleaned_data["tags"]
+        check.save()
+
+    return redirect("hc-checks")
+
+@login_required
+@uuid_or_400
+def update_escalation(request, code):
+    assert request.method == "POST"
+
+    check = get_object_or_404(Check, code=code)
+    if check.user_id != request.team.user.id:
+        return HttpResponseForbidden()
+
+    form = EscalationForm(request.POST)
+
+    if form.is_valid():
+        e_list = form.cleaned_data["escalation_list"]
+
+        SEPARATOR_RE = re.compile(r'[;]+')
+        emails = SEPARATOR_RE.split(e_list)
+        valid_emails = list()
+        for email in emails:
+            try:
+                validate_email(email)
+                valid_emails.append(email)
+            except:
+                messages.warning(request, "Invalid Email, kindly fill in a valid email format i.e kzy@gmail.com and seperate each email by a semicollon")
+        check.escalation_list = ';'.join(map(str, valid_emails))
+        check.escalation_interval = td(seconds=form.cleaned_data["escalation_interval"])
         check.save()
 
     return redirect("hc-checks")
@@ -462,7 +511,7 @@ def add_pushbullet(request):
             messages.success(request,
                              "The Pushbullet integration has been added!")
         else:
-            messages.warning(request, "Something went wrong")
+            messages.debug(request, "Something went wrong")
 
         return redirect("hc-channels")
 

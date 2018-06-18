@@ -29,13 +29,14 @@ table.table tr > th.th-name {
     vertical-align: middle;
 }
 
-#checks-table .my-checks-name {
+#checks-table .my-checks-name, #checks-table .my-checks-priority{
     border: 1px solid rgba(0, 0, 0, 0);
     padding: 6px;
     display: block;
 }
 
-#checks-table tr:hover .my-checks-name {
+
+#checks-table tr:hover .my-checks-name, #checks-table tr:hover .my-checks-priority{
     border: 1px dotted #AAA;
 }
 
