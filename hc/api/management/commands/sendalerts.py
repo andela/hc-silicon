@@ -7,6 +7,8 @@ from django.db import connection
 from django.utils import timezone
 from hc.api.models import Check, Channel
 from hc.accounts.models import Member
+from datetime import timedelta as td
+from hc.lib import emails
 
 executor = ThreadPoolExecutor(max_workers=10)
 logger = logging.getLogger(__name__)
@@ -20,6 +22,31 @@ class Command(BaseCommand):
         query = Check.objects.filter(user__isnull=False).select_related("user")
 
         now = timezone.now()
+
+        # Escalation email
+        for check in query:
+            if check.get_status() == "down":
+                if check.priority > 0:
+                    if not check.escalation_down:
+                        if not check.escalation_time:
+                            check.escalation_time = now + check.escalation_interval
+                            check.save()
+                        if check.escalation_time <= now:
+                            self.stdout.write(check.name+" is "+check.get_status())
+                            check.escalation_down = True
+                            check.escalation_up = False
+                            check.save()
+                            executor.submit(self.escalate_one(check, now))
+
+            elif check.get_status() == "up":
+                if check.priority > 0 and not check.escalation_up:
+                    check.escalation_down = False
+                    check.escalation_up = True
+                    check.escalation_time = None
+                    check.save()
+                    executor.submit(self.escalate_one(check, now))
+
+
         going_down = query.filter(alert_after__lt=now, status="up")
         going_up = query.filter(alert_after__gt=now, status="down")
         nag_on = query.filter(nag_after__lt=now, nag_status=True, status="down")
@@ -37,10 +64,8 @@ class Command(BaseCommand):
 
     def handle_one(self, check):
         """ Send an alert for a single check.
-
         Return True if an appropriate check was selected and processed.
         Return False if no checks need to be processed.
-
         """
 
         # Save the new status. If sendalerts crashes,
@@ -57,6 +82,14 @@ class Command(BaseCommand):
         self.send_alert(check)
         connection.close()
         return True
+
+    def escalate_one(self, check, now):
+        ctx = {
+            "check": check,
+            "now": now
+          }
+        emails.escalate(check.escalation_list, ctx)
+
 
     def send_alert(self, check):
         """Helper method to notify user"""

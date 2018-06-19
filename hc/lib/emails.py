@@ -15,6 +15,8 @@ def login(to, ctx):
 def set_password(to, ctx):
     send("set-password", to, ctx)
 
+def escalate(to, ctx):
+    send("escalation", to, ctx)
 
 def alert(to, ctx):
     send("alert", to, ctx)
