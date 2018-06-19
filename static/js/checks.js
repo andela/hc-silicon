@@ -181,6 +181,40 @@ $(function () {
         
     });
 
+
+// Escalation slider 
+
+
+    var escalationSlider = document.getElementById("escalation-slider");
+    noUiSlider.create(escalationSlider, {
+        start: [20],
+        connect: "lower",
+        range: {
+            'min': [60, 60],
+            '33%': [3600, 3600], 
+            '66%': [86400, 86400], 
+            'max': 2592000,
+        },
+        pips: {
+            mode: 'values',
+            values: [60, 1800, 3600, 43200, 86400, 1296000, 2592000],
+            density: 4,
+            format: {
+                to: secsToText,
+                from: function() {}
+            }
+        }
+    });
+
+    escalationSlider.noUiSlider.on("update", function(a, b, value) {
+        var rounded = Math.round(value);
+        $("#escalation-slider-value").text(secsToText(rounded));
+        $("#update-timeout-escalation").val(rounded);
+        console.log(rounded)
+    });
+
+// End escalation slider
+
     $('[data-toggle="tooltip"]').tooltip();
 
     $(".my-checks-name").click(function() {
@@ -195,6 +229,33 @@ $(function () {
         return false;
     });
 
+    $(".my-checks-priority").click(function() {
+        var $this = $(this);
+
+        $("#update-priority-form").attr("action", $this.data("url"));
+        $("#update-priority-input").val($this.data("priority"));
+        $('#update-priority-modal').modal("show");
+        $("#update-priority-input").focus();
+
+        return false;
+    });
+
+
+    // Escallation
+
+    $(".my-checks-escalation").click(function() {
+        var $this = $(this);
+
+        $("#update-escalation-form").attr("action", $this.data("url"));
+        $("#update-escalation-input").val($this.data("escalation_list"));
+        $('#update-escalation-modal').modal("show");
+        $("#update-escalation-input").focus();
+
+        return false;
+    });
+
+    // End Escalation
+    
     $(".timeout-grace").click(function() {
         var $this = $(this);
 
