@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     {% load compress staticfiles %}
     <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
 
@@ -31,6 +32,7 @@
     <link rel="stylesheet" href="{% static 'css/settings.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/radio.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/faq.css' %}" type="text/css">
     {% endcompress %}
 </head>
 <body class="page-{{ page }}">
@@ -103,6 +105,9 @@
                 <li {% if page == 'about' %} class="active" {% endif %}>
                     <a href="{% url 'hc-about' %}">About</a>
                 </li>
+                <li {% if page == 'faq' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-faq' %}">FAQ</a>
+                </li>
             </ul>
 
 
@@ -117,7 +122,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a id="nav-email" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                        {{ request.team }} <span class="caret"></span>
+                        {{ request.team }} <span class="caret"></span>                       
                     </a>
                     <ul class="dropdown-menu">
                         {% if request.teams %}
@@ -167,6 +172,7 @@
                 <li><a href="{% url 'hc-pricing' %}">Pricing</a></li>
                 {% endif %}
                 <li><a href="{% url 'hc-about' %}">Contact</a></li>
+                <li><a href="{% url 'hc-faq' %}">FAQ</a></li>
             </ul>
         </div>
     </footer>

@@ -23,6 +23,14 @@ class TimeoutForm(forms.Form):
     grace = forms.IntegerField(min_value=60)
     nag = forms.IntegerField(min_value=60)
 
+class EscalationForm(forms.Form):
+
+    escalation_list = forms.CharField()
+    escalation_interval = forms.IntegerField(min_value=60)
+    
+
+class PriorityForm(forms.Form):
+    priority = forms.IntegerField(required=True)
 
 
 class AddChannelForm(forms.ModelForm):
