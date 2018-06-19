@@ -17,6 +17,7 @@ from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
+from hc.accounts.models import Member, Department
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
                             TimeoutForm)
 from django.core.exceptions import ValidationError
@@ -33,8 +34,14 @@ def pairwise(iterable):
 @login_required
 def my_checks(request):
     q = Check.objects.filter(user=request.team.user).order_by("priority").reverse()
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if dept != None:
+            q = q.filter(department=dept)
     checks = list(q)
-
+ 
     counter = Counter()
     down_tags, grace_tags = set(), set()
     for check in checks:
@@ -54,6 +61,7 @@ def my_checks(request):
         "page": "checks",
         "checks": checks,
         "now": timezone.now(),
+        "department": dept,
         "tags": counter.most_common(),
         "down_tags": down_tags,
         "grace_tags": grace_tags,
@@ -130,8 +138,11 @@ def faq(request):
 @login_required
 def add_check(request):
     assert request.method == "POST"
-
-    check = Check(user=request.team.user)
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+    check = Check(user=request.team.user, department=dept)
     check.save()
 
     check.assign_all_channels()
@@ -145,9 +156,16 @@ def update_name(request, code):
     assert request.method == "POST"
 
     check = get_object_or_404(Check, code=code)
-    if check.user_id != request.team.user.id:
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
+    
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
-
+    
     form = NameTagsForm(request.POST)
     if form.is_valid():
         check.name = form.cleaned_data["name"]
@@ -209,7 +227,14 @@ def update_timeout(request, code):
     assert request.method == "POST"
 
     check = get_object_or_404(Check, code=code)
-    if check.user != request.team.user:
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
+    
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     form = TimeoutForm(request.POST)
@@ -228,7 +253,14 @@ def pause(request, code):
     assert request.method == "POST"
 
     check = get_object_or_404(Check, code=code)
-    if check.user_id != request.team.user.id:
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
+    
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     check.status = "paused"
@@ -243,7 +275,14 @@ def remove_check(request, code):
     assert request.method == "POST"
 
     check = get_object_or_404(Check, code=code)
-    if check.user != request.team.user:
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
+    
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     check.delete()
@@ -255,7 +294,14 @@ def remove_check(request, code):
 @uuid_or_400
 def log(request, code):
     check = get_object_or_404(Check, code=code)
-    if check.user != request.team.user:
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if check.department != dept:
+            return HttpResponseForbidden()
+
+    if (check.user_id != request.team.user.id):
         return HttpResponseForbidden()
 
     limit = request.team.ping_log_limit
@@ -611,12 +657,20 @@ def unresolved_issues(request):
     ''' Handle unresolved issues '''
     assert request.method == "GET"
     q = Check.objects.filter(user=request.team.user).order_by("created")
+    dept=None
+    if request.team.user.id != request.user.id:
+        member = Member.objects.get(team=request.team,user=request.user)
+        dept =  member.department
+        if dept != None:
+            q = q.filter(department=dept)
 
     checks = [ check for check in q if check.get_status() is "down"]
+    
 
     ctx = {
         "page": "issues",
         "checks": checks,
+        "department": dept,
         "ping_endpoint": settings.PING_ENDPOINT,
     }
     return render(request, "front/issues.html", ctx)

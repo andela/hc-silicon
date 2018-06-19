@@ -4,7 +4,8 @@
 <h1>Hello,</h1>
 
 {% if inviting_profile %}
-    <p><strong>{{ inviting_profile }}</strong> invites you to their
+    <p>
+      <strong>{{ inviting_profile }}</strong> Team{% if department %}, <strong>{{ department }}</strong> department{% endif %} invites you to their
     <a href="https://healthchecks.io">healthchecks.io</a> account.</p>
 
     <p>You will be able to manage their

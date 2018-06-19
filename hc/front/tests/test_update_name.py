@@ -6,8 +6,12 @@ class UpdateNameTestCase(BaseTestCase):
 
     def setUp(self):
         super(UpdateNameTestCase, self).setUp()
-        self.check = Check(user=self.alice)
+        self.check = Check(user=self.alice, department=self.department)
         self.check.save()
+
+        # Create an another check with no department
+        self.check_dep = Check(user=self.alice, department=None)
+        self.check_dep.save()
 
     def test_it_works(self):
         url = "/checks/%s/name/" % self.check.code
@@ -37,6 +41,14 @@ class UpdateNameTestCase(BaseTestCase):
         payload = {"name": "Charlie Sent This"}
 
         self.client.login(username="charlie@example.org", password="password")
+        r = self.client.post(url, data=payload)
+        assert r.status_code == 403
+
+    def test_it_checks_departments(self):
+        url = "/checks/%s/name/" % self.check_dep.code
+        payload = {"name": "Bob from ops dept"}
+
+        self.client.login(username="bob@example.org", password="password")
         r = self.client.post(url, data=payload)
         assert r.status_code == 403
 

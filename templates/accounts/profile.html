@@ -87,41 +87,99 @@
         <div class="panel panel-default">
             <div class="panel-body settings-block">
                 <h2>Team Access</h2>
-                {% if profile.member_set.count %}
-                <table class="table">
-                    <tr>
-                        <td>{{ profile.user.email }}</td>
-                        <td>Owner</td>
-                        <td>Priority</td>
-                    </tr>
-                    {% for member in profile.member_set.all %}
-                    <tr>
-                        <td>{{ member.user.email }} </td>
-                        <td>Member</td>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="email" value="{{ member.user.email }}">
-                            <td><div class="dropdown">
-                                <button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">{{ member.priority }}
-                                    <span class="caret"></span></button>
-                                <ul class="dropdown-menu priority-dropdown" >
-                                    <li><button type="submit" class="btn btn-default btn-xs btn-block" name="member_priority">{% if member.priority == 'HIGH' %}
-                                        LOW
-                                        {% else %}
-                                        HIGH
-                                        {% endif %}</button></li>
-                                </ul>
-                            </div></td>
-                        </form>
-                        <td>
-                            <a
-                                    href="#"
-                                    data-email="{{ member.user.email }}"
-                                    class="pull-right member-remove">Remove</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
+                {% if members|length %}
+                    <table class="table">
+                        <thead>
+                            <tr class="small">
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    Membership
+                                </th>
+                                <th>
+                                    Department
+                                </td>
+                                <td>
+                                  Priority
+                                </td>
+                                <th class="text-center">
+                                    Revoke
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ profile.user.email }}</td>
+                                <td colspan="4">Owner</td>
+                            </tr>
+                            {% for member in members %}
+                            <tr>
+                                <td>{{ member.user.email }} </td>
+                                <td>Member</td>
+                                <td class="text-center">
+                                    {% if member.department.name %}
+                                        {{ member.department }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                
+                                <td>
+                                  <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="email" value="{{ member.user.email }}">
+                                      <div class="dropdown">
+                                      <button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">{{ member.priority }}
+                                          <span class="caret"></span></button>
+                                      <ul class="dropdown-menu priority-dropdown" >
+                                          <li>
+                                            <button type="submit" class="btn btn-default btn-xs btn-block"name="member_priority">
+                                              {% if member.priority == 'HIGH' %}
+                                                LOW
+                                              {% else %}
+                                                HIGH
+                                              {% endif %}
+                                            </button>
+                                          </li>
+                                      </ul>
+                                    </div>
+                                  </form>
+                                </td>
+                              
+                                <td>
+                                    <a
+                                        href="#"
+                                        data-email="{{ member.user.email }}"
+                                        class="pull-right member-remove">Remove</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <nav aria-label="pagination">
+                        <ul class="pager">
+                            {% if members.has_previous %}
+                            <li class="previous">
+                                <a href="?page={{ members.previous_page_number }}">
+                                    <span aria-hidden="true">&larr;</span>
+                                    Previous
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if members.has_next %}
+                            <li class="next">
+                                <a href="?page={{ members.next_page_number }}">
+                                    Next
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <div class="text-center text-muted">
+                            - Page {{ members.number }} of {{ members.paginator.num_pages }} -
+                        </div>
+                    </nav>
                 {% else %}
                 <p>
                     <strong>Invite team members to your account.</strong>
@@ -354,6 +412,16 @@
                                     id="itm-email"
                                     name="email"
                                     placeholder="friend@example.org">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="itm-email" class="col-sm-2 control-label">Department</label>
+                        <div class="col-sm-9">
+                            <input
+                                type="department"
+                                class="form-control"
+                                name="department"
+                                placeholder="Department...">
                         </div>
                     </div>
                 </div>

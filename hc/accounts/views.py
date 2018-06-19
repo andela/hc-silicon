@@ -13,14 +13,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.core import signing
-from django.http import HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.core.paginator import Paginator
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm, ReportsForm,
-                               UpdateTeamMemberPriority)
-                               AlertForm)
-from hc.accounts.models import Profile, Member
+                               UpdateTeamMemberPriority, AlertForm)
+from hc.accounts.models import Profile, Member, Department
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
 
@@ -174,13 +174,27 @@ def profile(request):
             if form.is_valid():
 
                 email = form.cleaned_data["email"]
+                dept_name = form.cleaned_data["department"]
                 try:
                     user = User.objects.get(email=email)
                 except User.DoesNotExist:
                     user = _make_user(email)
-
-                profile.invite(user)
-                messages.success(request, "Invitation to %s sent!" % email)
+                if dept_name != None:
+                    try:
+                        department = Department.objects.get(name__iexact=dept_name, team=request.user.profile)
+                    except Department.DoesNotExist:
+                        department = Department(name=dept_name, team=request.user.profile)
+                        department.save()
+                else:
+                    department=None
+                try:
+                    member = Member.objects.get(team=request.team,user=user)
+                    member.department = department
+                    member.save()
+                    messages.success(request, "%s already exists in your team, department has been updated instead" % email)
+                except Member.DoesNotExist:
+                    profile.invite(user, department)
+                    messages.success(request, "Invitation to %s sent!" % email)
         elif "remove_team_member" in request.POST:
             form = RemoveTeamMemberForm(request.POST)
             if form.is_valid():
@@ -241,11 +255,30 @@ def profile(request):
             continue
 
         badge_urls.append(get_badge_url(username, tag))
+    members = list()
+    if profile.member_set.count:
+        for member in profile.member_set.all():
+            memb = member
+            setattr(memb, 'department', profile.department(member.user))
+            members.append(memb)
+    page = request.GET.get('page') or 1
+    try:
+        page = int(page)
+    except ValueError:
+        return HttpResponseBadRequest()
+
+    pag_members = Paginator(members, 4)
+
+    if not page in pag_members.page_range:
+        return HttpResponseNotFound()
+
+    members_page = pag_members.page(page)
 
     ctx = {
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
+        "members": members_page,
         "show_api_key": show_api_key
     }
 

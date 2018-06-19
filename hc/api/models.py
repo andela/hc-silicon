@@ -11,6 +11,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from hc.api import transports
+from hc.accounts.models import Department
 from hc.lib import emails
 
 STATUSES = (
@@ -46,6 +47,7 @@ class Check(models.Model):
 
     name = models.CharField(max_length=100, blank=True)
     tags = models.CharField(max_length=500, blank=True)
+    department = models.ForeignKey(Department,blank=True, null=True)
     code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     user = models.ForeignKey(User, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
