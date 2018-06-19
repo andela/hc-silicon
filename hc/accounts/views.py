@@ -18,6 +18,7 @@ from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm, ReportsForm,
+                               UpdateTeamMemberPriority)
                                AlertForm)
 from hc.accounts.models import Profile, Member
 from hc.api.models import Channel, Check
@@ -203,6 +204,22 @@ def profile(request):
                 profile.save()
                 messages.success(request, "Team Name updated!")
 
+        elif "member_priority" in request.POST:
+            form = UpdateTeamMemberPriority(request.POST)
+            if form.is_valid():
+                user_email = form.cleaned_data["email"]
+                user = User.objects.get(email=user_email)
+                get_user = Member.objects.filter(user=user, team=profile).first()
+
+                if get_user.priority == "LOW":
+                    get_user.priority = "HIGH"
+                    get_user.save()
+                    messages.success(request, "Your priority changed.")
+                else:
+                    get_user.priority = "LOW"
+                    get_user.save()
+                    messages.success(request, "Your priority changed.")
+                    
         elif "update_alert_mode" in request.POST:
 
             form = AlertForm(request.POST)

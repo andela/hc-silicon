@@ -77,3 +77,19 @@ body {
 .dialog-body {
     margin: 24px 0;
 }
+
+.priority-dropdown {
+    margin: 0px 0 0;
+    min-width: 71.75px;
+    padding: 0px 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-clip: padding-box;
+   }
+
+.btn-xs, .btn-group-xs > .btn {
+    padding: 1px 15px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
