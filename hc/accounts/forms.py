@@ -35,3 +35,8 @@ class TeamNameForm(forms.Form):
 
 class ReportsForm(forms.Form):
     reports_frequency = forms.CharField(required=True)
+
+
+class AlertForm(forms.Form):
+    alert_mode = forms.CharField(required=True)
+    phone_number = forms.CharField(required=True)

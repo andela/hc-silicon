@@ -17,7 +17,8 @@ from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
-                               SetPasswordForm, TeamNameForm, ReportsForm)
+                               SetPasswordForm, TeamNameForm, ReportsForm,
+                               AlertForm)
 from hc.accounts.models import Profile, Member
 from hc.api.models import Channel, Check
 from hc.lib.badges import get_badge_url
@@ -202,6 +203,16 @@ def profile(request):
                 profile.save()
                 messages.success(request, "Team Name updated!")
 
+        elif "update_alert_mode" in request.POST:
+
+            form = AlertForm(request.POST)
+            if form.is_valid():
+                profile.phone_number = form.cleaned_data["phone_number"]
+                profile.alert_mode = form.cleaned_data["alert_mode"]
+                profile.save()
+                profile.refresh_from_db()
+                messages.success(request, "Alert mode updated!")
+
     tags = set()
     for check in Check.objects.filter(user=request.team.user):
         tags.update(check.tags_list())
@@ -220,7 +231,6 @@ def profile(request):
         "profile": profile,
         "show_api_key": show_api_key
     }
-    print(profile.reports_frequency)
 
     return render(request, "accounts/profile.html", ctx)
 

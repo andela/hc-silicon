@@ -21,6 +21,8 @@ class Profile(models.Model):
     next_report_date = models.DateTimeField(null=True, blank=True)
     reports_allowed = models.BooleanField(default=True)
     reports_frequency = models.CharField(max_length=200, default="Monthly")
+    alert_mode = models.CharField(max_length=200, default="Email")
+    phone_number = models.CharField(max_length=200, null=True)
     ping_log_limit = models.IntegerField(default=100)
     token = models.CharField(max_length=128, blank=True)
     api_key = models.CharField(max_length=128, blank=True)

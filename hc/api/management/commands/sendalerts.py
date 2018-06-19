@@ -48,10 +48,13 @@ class Command(BaseCommand):
 
         going_down = query.filter(alert_after__lt=now, status="up")
         going_up = query.filter(alert_after__gt=now, status="down")
-        nag_on = query.filter(nag_after__lt=now, nag_status=True, status="down")
+        going_down_from_often = query.filter(
+            alert_after__lt=now, status="too often")
+        nag_on = query.filter(
+            nag_after__lt=now, nag_status=True, status="down")
         # Don't combine this in one query so Postgres can query using index:
         checks = list(going_down.iterator()) + list(going_up.iterator()) + \
-                        list(nag_on.iterator())
+            list(nag_on.iterator()) + list(going_down_from_often.iterator())
         if not checks:
             return False
 
@@ -72,7 +75,7 @@ class Command(BaseCommand):
         now = timezone.now()
         check.status = check.get_status()
 
-        if check.status == "down":
+        if check.status in ("down", "too often"):
             check.nag_after = timezone.now() + check.nag
             check.nag_status = True
 
@@ -97,8 +100,8 @@ class Command(BaseCommand):
         if errors is not None:
             for ch, error in errors:
                 self.stdout.write("ERROR: %s %s %s\n" %
-                                (ch.kind, ch.value, error))
-                                
+                                  (ch.kind, ch.value, error))
+
         connection.close()
         return True
 
