@@ -13,8 +13,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.core import signing
-from django.http import HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.core.paginator import Paginator
 from hc.accounts.forms import (EmailPasswordForm, InviteTeamMemberForm,
                                RemoveTeamMemberForm, ReportSettingsForm,
                                SetPasswordForm, TeamNameForm, ReportsForm)
@@ -233,12 +234,24 @@ def profile(request):
             memb = member
             setattr(memb, 'department', profile.department(member.user))
             members.append(memb)
+    page = request.GET.get('page') or 1
+    try:
+        page = int(page)
+    except ValueError:
+        return HttpResponseBadRequest()
+
+    pag_members = Paginator(members, 4)
+
+    if not page in pag_members.page_range:
+        return HttpResponseNotFound()
+
+    members_page = pag_members.page(page)
 
     ctx = {
         "page": "profile",
         "badge_urls": badge_urls,
         "profile": profile,
-        "members": members,
+        "members": members_page,
         "show_api_key": show_api_key
     }
 

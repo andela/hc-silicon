@@ -110,7 +110,7 @@
                                 <td>{{ profile.user.email }}</td>
                                 <td colspan="3">Owner</td>
                             </tr>
-                            {% for member in members%}
+                            {% for member in members %}
                             <tr>
                                 <td>{{ member.user.email }} </td>
                                 <td>Member</td>
@@ -131,6 +131,29 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <nav aria-label="pagination">
+                        <ul class="pager">
+                            {% if members.has_previous %}
+                            <li class="previous">
+                                <a href="?page={{ members.previous_page_number }}">
+                                    <span aria-hidden="true">&larr;</span>
+                                    Previous
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if members.has_next %}
+                            <li class="next">
+                                <a href="?page={{ members.next_page_number }}">
+                                    Next
+                                    <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <div class="text-center text-muted">
+                            - Page {{ members.number }} of {{ members.paginator.num_pages }} -
+                        </div>
+                    </nav>
                 {% else %}
                     <p>
                         <strong>Invite team members to your account.</strong>
