@@ -39,3 +39,8 @@ class ReportsForm(forms.Form):
 
 class UpdateTeamMemberPriority(forms.Form):
     email = LowercaseEmailField()
+
+
+class AlertForm(forms.Form):
+    alert_mode = forms.CharField(required=True)
+    phone_number = forms.CharField(required=True)
