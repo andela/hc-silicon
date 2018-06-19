@@ -77,3 +77,9 @@ body {
 .dialog-body {
     margin: 24px 0;
 }
+
+.priority-dropdown {
+    margin: 0px 0 0;
+    min-width: 0;
+    padding: 0px 0;
+}

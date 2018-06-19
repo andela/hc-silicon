@@ -101,9 +101,17 @@
                         <form method="post">
                             {% csrf_token %}
                             <input type="hidden" name="email" value="{{ member.user.email }}">
-                            <td> <button type="submit" class="btn btn-default btn-xs" name="member_priority">
-                                {{ member.priority }}
-                            </button></td>
+                            <td><div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle btn-xs" type="button" data-toggle="dropdown">{{ member.priority }}
+                                    <span class="caret"></span></button>
+                                <ul class="dropdown-menu priority-dropdown" >
+                                    <li><button type="submit" class="btn btn-primary btn-xs" name="member_priority">{% if member.priority == 'HIGH' %}
+                                        LOW
+                                        {% else %}
+                                        HIGH
+                                        {% endif %}</button></li>
+                                </ul>
+                            </div></td>
                         </form>
                         <td>
                             <a
