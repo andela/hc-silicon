@@ -36,3 +36,12 @@ class TeamNameForm(forms.Form):
 
 class ReportsForm(forms.Form):
     reports_frequency = forms.CharField(required=True)
+
+
+class UpdateTeamMemberPriority(forms.Form):
+    email = LowercaseEmailField()
+
+
+class AlertForm(forms.Form):
+    alert_mode = forms.CharField(required=True)
+    phone_number = forms.CharField(required=True)
