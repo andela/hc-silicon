@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 self.stdout.write("-- MARK %s --" % formatted)
 
     def handles_priority(self, check):
-        members = Member.objects.filter(team=check.user.profile).all()
+        members = Member.objects.filter(team=check.user.profile).all().order_by("priority")
 
         for member in members:
             if member.priority == "LOW" or (member.priority == "HIGH" and not check.is_alerted):

@@ -59,6 +59,7 @@ class Check(models.Model):
     status = models.CharField(max_length=9, choices=STATUSES, default="new")
     member_allowed_access = models.BooleanField(default=False)
     member_allowed_id = models.IntegerField(default=0)
+    is_alerted = models.BooleanField(default=False)
 
     def name_then_code(self):
         if self.name:
