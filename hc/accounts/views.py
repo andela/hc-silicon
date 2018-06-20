@@ -147,6 +147,7 @@ def profile(request):
     check_db = Check.objects.filter(user=request.user).order_by("created")
     checks = list(check_db)
     checks.append(check_db)
+    # check = Check.objects.filter(user=request.team.user)
 
     show_api_key = False
     if request.method == "POST":
@@ -179,6 +180,7 @@ def profile(request):
 
                 email = form.cleaned_data["email"]
                 dept_name = form.cleaned_data["department"]
+                check = form.cleaned_data["check"]
                 try:
                     user = User.objects.get(email=email)
                 except User.DoesNotExist:
@@ -199,6 +201,10 @@ def profile(request):
                 except Member.DoesNotExist:
                     profile.invite(user, department)
                     messages.success(request, "Invitation to %s sent!" % email)
+
+                check_object = Check.objects.get(name=check)
+                profile.invite(user, check_object)
+                messages.success(request, "Invitation to %s sent!" % email)
         elif "remove_team_member" in request.POST:
             form = RemoveTeamMemberForm(request.POST)
             if form.is_valid():

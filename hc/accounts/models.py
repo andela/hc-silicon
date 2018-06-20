@@ -97,7 +97,7 @@ class Profile(models.Model):
 
         emails.report(self.user.email, ctx)
 
-    def invite(self, user, department):
+    def invite(self, user, department, check):
         member = Member(team=self, user=user, department=department)
         member.save()
         
@@ -109,6 +109,11 @@ class Profile(models.Model):
             department = department.name
         user.profile.send_instant_login_link(self,department=department)
 
+        check.membership_access = True
+        check.member_id = int(user.id)
+        check.save()
+
+        user.profile.send_instant_login_link(self)
 
 
 class Department(models.Model):
