@@ -733,3 +733,42 @@ def add_category(request):
 def read_blogpost(request, id):
     blog = Blog.objects.get(id=int(id))
     return render(request, "front/read_blog.html", {'blog': blog, 'siteroot': settings.SITE_ROOT, 'msg':'Read more about the blog:' })
+
+@login_required
+def remove_blogpost(request, id):
+    blog = Blog.objects.get(id=int(id))
+   
+    try:
+        blog.delete()
+        messages.info(request, "Blogpost deleted successfully")
+    except:
+        messages.warning(request, "Blogpost not deleted, kindly try again")
+
+    return redirect("hc-blog")
+
+@login_required
+def edit_blogpost(request, id):
+    user=request.team.user.id
+    blog = Blog.objects.get(id=int(id))
+    categories = BlogCategories.objects.all()
+
+    if request.method == "GET":
+        form = BlogForm()
+        return render(request, "front/edit_blog.html", {'blog': blog, 'form': form, 'categories':categories})
+
+    elif request.method == "POST":
+        form = BlogForm(request.POST)
+        if form.is_valid():
+            blog.title = form.cleaned_data['title']
+            blog.category = form.cleaned_data['category']
+            blog.content = form.cleaned_data['content']
+
+            try:
+                blog.save()
+                messages.success(request, "Blogpost edited successfully")
+                return render(request, "front/read_blog.html", {'blog': blog})
+            except:
+                messages.warning(request, "Blogpost not edited, kindly try again")
+                return redirect("hc-blog")
+
+    return render(request, "front/edit_blog.html", {'blog': blog, 'form': form, 'categories':categories})

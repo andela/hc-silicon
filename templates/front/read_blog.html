@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Blog - healthchecks.io{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-12">
+
+        {% if request.user.is_authenticated %}
+
+            <div >
+            <a href="{% url 'hc-add-blog' %}">
+            <button class="btn btn-primary btn-sm" style="float:right" >Create new blogpost</button></a>
+                
+            </div>
+        {% else %}
+        <a href="/accounts/login/">
+        <button class="btn btn-primary btn-sm" style="float:right">Login to create a blogpost</button></a>
+        {% endif %}
+
+</div>
+
+<br>
+{% if blog %}
+
+<div class="row">
+
+        {% if messages %}
+        <div style="margin-top: 50px">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message }}
+              </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="col-sm-1"></div>  
+        <div class="col-sm-10" style="border:1px solid grey; padding-bottom: 20px;padding-top: 20px; margin-top:30px; border-radius:5px"> 
+
+            <p style="font-weight: bold; font-size:16px">{{blog.title}}</p> 
+            <p style="text-align: right"> <b>Created by: </b>{{blog.user}} <b style="margin-left: 50px">Date:</b>{{blog.created}}</p>
+            <div> 
+                    {{ blog.content|safe }}
+
+            </div><br>
+            <span style="float:right">
+            {% if request.user == blog.user%}
+
+                <a href="{% url 'hc-edit-blogpost' blog.id %}" class="btn btn-info btn-sm">Edit</a>
+                <a href="{% url 'hc-remove-blogpost' blog.id %}" class="btn btn-danger btn-sm">Delete</a>
+                {% else %}
+                <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u={{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-facebook"></a>
+                <a target="_blank" href="https://twitter.com/intent/tweet?text={{msg}}%20{{ blog.title }}%20at%20{{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-twitter"></a>
+                <a target="_blank" href="https://plus.google.com/share?url={{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-google"></a>
+                
+                {% endif %}
+            </span>
+
+            {% if request.user == blog.user%}
+            <div class="social-buttons">
+                <a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u={{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-facebook"></a>
+                <a target="_blank" href="https://twitter.com/intent/tweet?text={{msg}}%20{{ blog.title }}%20at%20{{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-twitter"></a>
+                <a target="_blank" href="https://plus.google.com/share?url={{siteroot}}{{ request.get_full_path|urlencode }}" class="fa fa-google"></a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-1"></div>
+
+        </div> <br> <br>
+
+{% else %}
+<div class="alert alert-info" style="margin-top: 50px">No more info.</div>
+{% endif %}
+{% endblock %}
