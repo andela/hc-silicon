@@ -729,3 +729,7 @@ def add_category(request):
             messages.warning(request, "Category not added, kindly try again")
 
     return redirect("hc-add-blog")
+
+def read_blogpost(request, id):
+    blog = Blog.objects.get(id=int(id))
+    return render(request, "front/read_blog.html", {'blog': blog, 'siteroot': settings.SITE_ROOT, 'msg':'Read more about the blog:' })
