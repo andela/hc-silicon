@@ -790,7 +790,7 @@ def create_github_webhook(request):
                 all_entities.append(repo_name)
                 api.entities = all_entities
                 api.save()
-            except github.GithubException, e:
+            except github.GithubException as e:
                 print(e)
                 pass
     except Platforms.DoesNotExist:
@@ -808,7 +808,7 @@ def github_repos(request):
                 g = Github(api.access_token)
                 repos = g.get_user().get_repos()
                 github_integration = True
-            except github.GithubException, e:
+            except github.GithubException as e:
                 print(e)
                 api.granted = False
                 api.access_token = None
