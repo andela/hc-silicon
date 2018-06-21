@@ -16,10 +16,10 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
-from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog
+from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog, BlogCategories
 from hc.accounts.models import Member, Department
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
-                            TimeoutForm, BlogForm)
+                            TimeoutForm, BlogForm, BlogCategoriesForm)
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 
@@ -708,5 +708,24 @@ def create_blogpost(request):
             messages.info(request, "Blogpost published successfully")
         except:
             messages.warning(request, "Blogpost not published, kindly try again")
+
+    return redirect("hc-add-blog")
+
+@login_required
+def add_category(request):
+    user=request.team.user.id
+
+    form = BlogCategoriesForm(request.POST)
+
+    if form.is_valid():
+        category = form.cleaned_data["category"]
+
+        blogcategory = BlogCategories(category=category)
+
+        try:
+            blogcategory.save()
+            messages.info(request, "Category added successfully")
+        except:
+            messages.warning(request, "Category not added, kindly try again")
 
     return redirect("hc-add-blog")

@@ -309,3 +309,8 @@ class Blog(models.Model):
     title = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
     content = models.TextField()
+
+class BlogCategories(models.Model):
+
+    code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    category = models.CharField(max_length=100)

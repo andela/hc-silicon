@@ -34,6 +34,7 @@ blog_urls = [
 
     url(r'^add/$', views.add_blog, name="hc-add-blog"),
     url(r'^create/$', views.create_blogpost, name="hc-create-blogpost"),
+    url(r'^category/$', views.add_category, name="hc-add-category"),
 ]
 urlpatterns = [
     url(r'^$', views.index, name="hc-index"),
