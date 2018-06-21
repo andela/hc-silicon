@@ -52,3 +52,6 @@ class AddWebhookForm(forms.Form):
 
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
+
+class AddGitWebhookForm(forms.Form):
+    repo_name = forms.CharField(required=True)

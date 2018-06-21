@@ -7,6 +7,7 @@ from datetime import timedelta as td
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -300,3 +301,15 @@ class Notification(models.Model):
     channel = models.ForeignKey(Channel)
     created = models.DateTimeField(auto_now_add=True)
     error = models.CharField(max_length=200, blank=True)
+
+class Platforms(models.Model):
+    name= models.CharField(max_length=100,null=False, default=None)
+    user = models.ForeignKey(User)
+    created = models.DateTimeField(auto_now_add=True)
+    granted = models.BooleanField(default=False)
+    state = models.TextField(null=True)
+    code = models.TextField(null=True)
+    access_token = models.TextField(null=True)
+    token_type = models.CharField(max_length=100, null=True)
+    scopes = models.TextField(null=True)
+    entities = ArrayField(models.CharField(max_length=200), null=True, blank=True)
