@@ -52,3 +52,8 @@ class AddWebhookForm(forms.Form):
 
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
+
+class BlogForm(forms.Form):
+    title = forms.CharField(required=True)
+    category = forms.CharField(required=True)
+    content = forms.CharField(required=True)

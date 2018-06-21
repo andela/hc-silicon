@@ -16,10 +16,10 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
-from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
+from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog
 from hc.accounts.models import Member, Department
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
-                            TimeoutForm)
+                            TimeoutForm, BlogForm)
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 
@@ -674,3 +674,39 @@ def unresolved_issues(request):
         "ping_endpoint": settings.PING_ENDPOINT,
     }
     return render(request, "front/issues.html", ctx)
+
+def blog(request):
+
+    blog = Blog.objects.order_by("-created").all()
+    blogs = list(blog)
+    ctx = {
+        "blogs": blogs
+    }
+    return render(request, "front/blog.html", ctx)
+
+def add_blog(request):
+    cat =  BlogCategories.objects.all()
+    categories = list(cat)
+    return render(request, "front/add_blog.html", {"categories": categories})
+
+
+@login_required
+def create_blogpost(request):
+    user=request.team.user.id
+
+    form = BlogForm(request.POST)
+
+    if form.is_valid():
+        title = form.cleaned_data["title"]
+        category = form.cleaned_data["category"]
+        content = form.cleaned_data["content"]
+
+        blog = Blog(title=title, category=category, content=content)
+
+        try:
+            blog.save()
+            messages.info(request, "Blogpost published successfully")
+        except:
+            messages.warning(request, "Blogpost not published, kindly try again")
+
+    return redirect("hc-add-blog")
