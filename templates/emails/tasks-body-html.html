@@ -1,0 +1,15 @@
+{% load humanize hc_extras %}
+{% block content %}
+
+<h1>Hello,</h1>
+
+<p>
+    This is an email sent from <a href="https://healthchecks.io">healthchecks.io</a>.
+</p>
+
+<p>{{body | safe }}</p>
+
+<p>To respond contact {{username}} : {{email}}</p>
+<p>Regards,<br>The Healthchecks<span>.</span>io Team</p>
+
+{% endblock %}
