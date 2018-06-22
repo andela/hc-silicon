@@ -300,3 +300,17 @@ class Notification(models.Model):
     channel = models.ForeignKey(Channel)
     created = models.DateTimeField(auto_now_add=True)
     error = models.CharField(max_length=200, blank=True)
+
+class Blog(models.Model):
+
+    code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    user = models.ForeignKey(User, blank=True, default=1)
+    created = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100)
+    category = models.CharField(max_length=100)
+    content = models.TextField()
+
+class BlogCategories(models.Model):
+
+    code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    category = models.CharField(max_length=100)
