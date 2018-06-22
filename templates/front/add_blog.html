@@ -47,9 +47,11 @@
                         </div>
                         <div class="col-sm-10">
                             <select name="category" id="" class="form-control" required>
-                                <option>Qwerty</option>
-                                <option>Scudo</option>
-                                <option>Kaizen</option>
+                                <option>Business</option>
+                                <option>Finance</option>
+                                {% for category in categories%}
+                                <option>{{category.category}}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div> <br> <br> <br>
@@ -84,6 +86,8 @@
 
                 <h4>Available categories</h4> <br>
                 <ul>
+                        <li>Business</li><br>
+                        <li>Finance</li><br>
                     {% for category in categories %}
                         <li>{{category.category}}</li><br>
                     {% endfor %}

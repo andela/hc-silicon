@@ -720,13 +720,19 @@ def add_category(request):
     if form.is_valid():
         category = form.cleaned_data["category"]
 
-        blogcategory = BlogCategories(category=category)
+        cat = [c for c in BlogCategories.objects.all() if c.category.lower()==category.lower()]
 
-        try:
-            blogcategory.save()
-            messages.info(request, "Category added successfully")
-        except:
-            messages.warning(request, "Category not added, kindly try again")
+        if cat:
+            messages.warning(request, "That category already exists.")
+        else:
+
+            blogcategory = BlogCategories(category=category)
+
+            try:
+                blogcategory.save()
+                messages.info(request, "Category added successfully")
+            except:
+                messages.warning(request, "Category not added, kindly try again")
 
     return redirect("hc-add-blog")
 
