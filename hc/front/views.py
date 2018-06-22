@@ -19,9 +19,11 @@ from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog, BlogCategories
 from hc.accounts.models import Member, Department
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
-                            TimeoutForm, BlogForm, BlogCategoriesForm)
+                            TimeoutForm, EmailTaskForm, BackupTaskForm BlogForm, BlogCategoriesForm)
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
+from hc.lib import emails
+from hc.front.backup import checks_summary, check_log
 
 # from itertools recipes:
 def pairwise(iterable):
@@ -139,6 +141,14 @@ def docs_api(request):
 def about(request):
     return render(request, "front/about.html", {"page": "about"})
 
+def tasks(request):
+    q = Check.objects.filter(user=request.team.user).order_by("priority").reverse()
+    checks = list(q)
+    ctx = {
+        "checks":checks
+    }
+    return render(request, "front/tasks.html",  ctx)
+
 def faq(request):
     return render(request, "front/faq.html", {"page": "faq"})
 
@@ -181,6 +191,47 @@ def update_name(request, code):
         check.save()
 
     return redirect("hc-checks")
+
+@login_required
+def send_email(request):
+    assert request.method == "POST"
+
+    profile = request.user.profile
+    form = EmailTaskForm(request.POST)
+    if form.is_valid():
+        recipient = form.cleaned_data['recipient_email']
+        subject = form.cleaned_data['email_subject']
+        body= form.cleaned_data['email_body']
+        ctx = {
+            "username": profile.user.username,
+            "email": profile.user.email,
+            "subject":subject,
+            "body":body
+        }
+        emails.send_task(recipient, ctx)
+
+        messages.success(request, "Email sent")
+
+    return redirect("hc-tasks")
+
+@login_required
+def backup(request):
+    assert request.method == "POST"
+
+    profile = request.user.profile
+    checks = Check.objects.filter(user=profile.user)
+    form = BackupTaskForm(request.POST)
+    if form.is_valid():
+        fileName = form.cleaned_data['file_name']
+        check_name = form.cleaned_data['check_name']
+        if check_name == "All Checks":
+            return checks_summary(request, fileName, checks)
+        check = get_object_or_404(Check, name=check_name)
+        pings = Ping.objects.filter(owner=check).order_by("-id")
+        return check_log(request, fileName, pings)
+
+    return redirect("hc-tasks")
+
 
 @login_required
 @uuid_or_400

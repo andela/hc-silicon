@@ -53,6 +53,17 @@ class AddWebhookForm(forms.Form):
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
 
+class EmailTaskForm(forms.Form):
+
+    recipient_email = forms.EmailField(required=True)
+    email_subject = forms.CharField(required=True)
+    email_body= forms.CharField(required=False)
+
+class BackupTaskForm(forms.Form):
+
+    file_name = forms.CharField(required=True)
+    check_name = forms.CharField(required=True)
+
 class BlogForm(forms.Form):
     title = forms.CharField(required=True)
     category = forms.CharField(required=True)
@@ -60,3 +71,4 @@ class BlogForm(forms.Form):
 
 class BlogCategoriesForm(forms.Form):
     category = forms.CharField(required=True)
+
