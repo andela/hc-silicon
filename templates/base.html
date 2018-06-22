@@ -33,6 +33,11 @@
     <link rel="stylesheet" href="{% static 'css/radio.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/intlTelInput.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/faq.css' %}" type="text/css">
+
+    <link rel="stylesheet" href="{% static 'css/social_media_links.css' %}" type="text/css">
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     {% endcompress %}
 </head>
 <body class="page-{{ page }}">
@@ -108,6 +113,10 @@
 
                 <li {% if page == 'about' %} class="active" {% endif %}>
                     <a href="{% url 'hc-about' %}">About</a>
+                </li>
+
+                <li {% if page == 'blog' %} class="active" {% endif %}>
+                        <a href="{% url 'hc-blog' %}">Blog</a>
                 </li>
                 <li {% if page == 'faq' %} class="active" {% endif %}>
                     <a href="{% url 'hc-faq' %}">FAQ</a>

@@ -51,6 +51,8 @@ class Check(models.Model):
     department = models.ForeignKey(Department,blank=True, null=True)
     code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
     user = models.ForeignKey(User, blank=True, null=True)
+    member_id = models.IntegerField(default=0)
+    membership_access = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     timeout = models.DurationField(default=DEFAULT_TIMEOUT)
     grace = models.DurationField(default=DEFAULT_GRACE)
@@ -313,3 +315,17 @@ class Platforms(models.Model):
     token_type = models.CharField(max_length=100, null=True)
     scopes = models.TextField(null=True)
     entities = ArrayField(models.CharField(max_length=200), null=True, blank=True)
+
+class Blog(models.Model):
+
+    code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    user = models.ForeignKey(User, blank=True, default=1)
+    created = models.DateTimeField(auto_now_add=True)
+    title = models.CharField(max_length=100)
+    category = models.CharField(max_length=100)
+    content = models.TextField()
+
+class BlogCategories(models.Model):
+
+    code = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True)
+    category = models.CharField(max_length=100)
