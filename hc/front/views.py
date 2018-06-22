@@ -16,10 +16,10 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
-from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping
+from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog, BlogCategories
 from hc.accounts.models import Member, Department
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
-                            TimeoutForm, EmailTaskForm, BackupTaskForm)
+                            TimeoutForm, EmailTaskForm, BackupTaskForm BlogForm, BlogCategoriesForm)
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from hc.lib import emails
@@ -32,7 +32,6 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
-
 @login_required
 def my_checks(request):
     q = Check.objects.filter(user=request.team.user).order_by("priority").reverse()
@@ -44,6 +43,15 @@ def my_checks(request):
             q = q.filter(department=dept)
     checks = list(q)
  
+    if request.team == request.user.profile:
+        owner = Check.objects.filter(user=request.team.user).order_by("created")
+        checks = list(owner)
+    else:
+        member_checks = Check.objects.filter(user=request.team.user, 
+                        membership_access=True, member_id=request.user.id).\
+                            order_by("created")    
+        checks = list(member_checks)
+
     counter = Counter()
     down_tags, grace_tags = set(), set()
     for check in checks:
@@ -725,3 +733,107 @@ def unresolved_issues(request):
         "ping_endpoint": settings.PING_ENDPOINT,
     }
     return render(request, "front/issues.html", ctx)
+
+def blog(request):
+
+    blog = Blog.objects.order_by("-created").all()
+    blogs = list(blog)
+    ctx = {
+        "blogs": blogs
+    }
+    return render(request, "front/blog.html", ctx)
+
+def add_blog(request):
+    cat =  BlogCategories.objects.all()
+    categories = list(cat)
+    return render(request, "front/add_blog.html", {"categories": categories})
+
+
+@login_required
+def create_blogpost(request):
+    user=request.team.user.id
+
+    form = BlogForm(request.POST)
+
+    if form.is_valid():
+        title = form.cleaned_data["title"]
+        category = form.cleaned_data["category"]
+        content = form.cleaned_data["content"]
+
+        blog = Blog(title=title, category=category, content=content)
+
+        try:
+            blog.save()
+            messages.info(request, "Blogpost published successfully")
+        except:
+            messages.warning(request, "Blogpost not published, kindly try again")
+
+    return redirect("hc-add-blog")
+
+@login_required
+def add_category(request):
+    user=request.team.user.id
+
+    form = BlogCategoriesForm(request.POST)
+
+    if form.is_valid():
+        category = form.cleaned_data["category"]
+
+        cat = [c for c in BlogCategories.objects.all() if c.category.lower()==category.lower()]
+
+        if cat:
+            messages.warning(request, "That category already exists.")
+        else:
+
+            blogcategory = BlogCategories(category=category)
+
+            try:
+                blogcategory.save()
+                messages.info(request, "Category added successfully")
+            except:
+                messages.warning(request, "Category not added, kindly try again")
+
+    return redirect("hc-add-blog")
+
+def read_blogpost(request, id):
+    blog = Blog.objects.get(id=int(id))
+    return render(request, "front/read_blog.html", {'blog': blog, 'siteroot': settings.SITE_ROOT, 'msg':'Read more about the blog:' })
+
+@login_required
+def remove_blogpost(request, id):
+    blog = Blog.objects.get(id=int(id))
+   
+    try:
+        blog.delete()
+        messages.info(request, "Blogpost deleted successfully")
+    except:
+        messages.warning(request, "Blogpost not deleted, kindly try again")
+
+    return redirect("hc-blog")
+
+@login_required
+def edit_blogpost(request, id):
+    user=request.team.user.id
+    blog = Blog.objects.get(id=int(id))
+    categories = BlogCategories.objects.all()
+
+    if request.method == "GET":
+        form = BlogForm()
+        return render(request, "front/edit_blog.html", {'blog': blog, 'form': form, 'categories':categories})
+
+    elif request.method == "POST":
+        form = BlogForm(request.POST)
+        if form.is_valid():
+            blog.title = form.cleaned_data['title']
+            blog.category = form.cleaned_data['category']
+            blog.content = form.cleaned_data['content']
+
+            try:
+                blog.save()
+                messages.success(request, "Blogpost edited successfully")
+                return render(request, "front/read_blog.html", {'blog': blog})
+            except:
+                messages.warning(request, "Blogpost not edited, kindly try again")
+                return redirect("hc-blog")
+
+    return render(request, "front/edit_blog.html", {'blog': blog, 'form': form, 'categories':categories})

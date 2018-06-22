@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Blog - healthchecks.io{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-12">
+    <h3>Healthchecks Blogposts</h3>
+
+        {% if request.user.is_authenticated %}
+
+            <div >
+            <a href="{% url 'hc-add-blog' %}">
+            <button class="btn btn-primary btn-sm" style="float:right" >Create new blogpost</button></a>
+                
+            </div>
+        {% else %}
+        <a href="/accounts/login/">
+        <button class="btn btn-primary btn-sm" style="float:right">Login to create a blogpost</button></a>
+        {% endif %}
+
+</div>
+
+{% if messages %}
+<br>
+
+<div style="margin-top: 50px">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+      </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<br>
+{% if blogs %}
+{% include "front/blog_desktop.html" %}
+{% else %}
+<br>
+<div class="alert alert-info" style="margin-top: 50px">No blogs available.</div>
+{% endif %}
+{% endblock %}

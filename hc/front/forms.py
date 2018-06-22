@@ -63,3 +63,12 @@ class BackupTaskForm(forms.Form):
 
     file_name = forms.CharField(required=True)
     check_name = forms.CharField(required=True)
+
+class BlogForm(forms.Form):
+    title = forms.CharField(required=True)
+    category = forms.CharField(required=True)
+    content = forms.CharField(required=True)
+
+class BlogCategoriesForm(forms.Form):
+    category = forms.CharField(required=True)
+
