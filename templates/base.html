@@ -88,6 +88,10 @@
                         <a href="{% url 'issues' %}">Issues</a>
                     </li>
 
+                    <li {% if page == 'third-party-checks' %} class="active" {% endif %}>
+                        <a href="{% url 'hc-platforms' %}">Third-party checks</a>
+                    </li>
+
                     <li {% if page == 'channels' %} class="active" {% endif %}>
                         <a href="{% url 'hc-channels' %}">Integrations</a>
                     </li>

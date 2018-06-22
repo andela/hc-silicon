@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load compress staticfiles %}
+
+{% block title %} Third-party platforms checks - healthchecks.io{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <h1>
+           Create checks for your favorite platforms <br/><br/>
+        </h1>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-sm-4 text-center">
+        <div class="well">
+            <a href="{% url 'hc-platforms-github' %}">
+                <img src="{% static 'img/logos/GitHub-Mark-120px-plus.png' %}" class="icon" alt="Github icon" />
+            </a><hr/>
+            <b>Github</b>
+            {% if github %}
+                {% if repos %}
+                    <hr/>
+                    <ul class="list-group-item list-unstyled text-left">
+                        <li class="text-center"><b>Added repositories</b><hr/></li>
+                        {% for repo in repos %}
+                            <li> - <i> {{ repo }} </i></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <hr/>
+                <button class="btn btn-success btn-sm" id="add-repo">Add repository</button>
+                <form action="{% url 'hc-integrate-github' %}" method="post" id="create-webhook-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="repo_name" id="repo_name" />
+                </form>
+            {% else %}
+                <hr/>
+                <a href="{% url 'hc-platforms-github' %}">
+                    <button class="btn btn-success">Authorize Github integration</button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="repositories-modal" tabindex="-1" role="dialog" aria-labelledby="repositoriesModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="repositoriesModal">Choose repository</h4>
+            </div>
+            <div class="modal-body">
+                <h1 class="text-center" id="loader">Loading repositories</h1>
+                <table class="table table-bordered hidden" id="repos-table">
+                    <tr>
+                        <th colspan="2">
+                            Repository name
+                        </th>
+                    </tr>
+                    <tbody class="repos">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+    $('#add-repo').click(function(){
+        $('#repositories-modal').modal('show');
+    });
+    $('#repositories-modal').on('shown.bs.modal', function () {
+        $('#loader').show();
+        $('#repos-table').addClass('hidden');
+        $.get("{% url 'hc-github-repos' %}",function(data){
+            $.each(data.repos, function(key, name){
+                $('.repos').append('<tr><td>'+name+'</td><td class="text-center"><button class="btn btn-xs btn-success create-hook-btn" data-repo-name="'+name+'">Create a check</button></td></tr>');
+            });
+        }
+        ).done(function(){
+            $('#loader').hide();
+            $('#repos-table').removeClass('hidden');
+        });
+    }).on('hidden.bs.modal', function () {
+        $('#loader').show();
+        $('#repos-table').addClass('hidden');
+    });
+    $(document).on('click','.create-hook-btn', function () {
+            $("input#repo_name").val($(this).data('repo-name'));
+            $("#create-webhook-form").submit();
+        });
+</script>
+{% endcompress %}
+{% endblock %}

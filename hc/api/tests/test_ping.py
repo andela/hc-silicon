@@ -2,6 +2,7 @@ from django.test import Client, TestCase
 from django.core import mail
 
 from hc.api.models import Check, Ping, User
+from hc.accounts.models import Profile
 
 
 class PingTestCase(TestCase):
@@ -13,6 +14,11 @@ class PingTestCase(TestCase):
         user.save()
         check = Check(user=user)
         check.save()
+
+        # Create user profile
+        profile = Profile(user=user, api_key="abc", department=None)
+        profile.save()
+
         self.check = check
 
     def test_it_works(self):

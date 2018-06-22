@@ -16,7 +16,8 @@ class SendAlertsTestCase(BaseTestCase):
 
         for name in names:
             check = Check(user=self.alice, name=name)
-            check.alert_after = yesterday
+            check.last_ping = yesterday
+            check.alert_after = timezone.now()
             check.status = "up"
             check.save()
 

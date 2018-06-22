@@ -28,7 +28,7 @@ class CreateCheckTestCase(BaseTestCase):
             "name": "Foo",
             "tags": "bar,baz",
             "timeout": 3600,
-            "grace": 60
+            "grace": 3600
         })
 
         self.assertEqual(r.status_code, 201)
@@ -49,7 +49,7 @@ class CreateCheckTestCase(BaseTestCase):
         self.assertEqual(check.name, "Foo")
         self.assertEqual(check.tags, "bar,baz")
         self.assertEqual(check.timeout.total_seconds(), 3600)
-        self.assertEqual(check.grace.total_seconds(), 60)
+        self.assertEqual(check.grace.total_seconds(), 3600)
 
     def test_it_accepts_api_key_in_header(self):
         ### Make the post request and get the response

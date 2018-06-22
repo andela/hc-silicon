@@ -53,6 +53,9 @@ class AddWebhookForm(forms.Form):
     def get_value(self):
         return "{value_down}\n{value_up}".format(**self.cleaned_data)
 
+class AddGitWebhookForm(forms.Form):
+    repo_name = forms.CharField(required=True)
+
 class EmailTaskForm(forms.Form):
 
     recipient_email = forms.EmailField(required=True)
@@ -63,6 +66,7 @@ class BackupTaskForm(forms.Form):
 
     file_name = forms.CharField(required=True)
     check_name = forms.CharField(required=True)
+
 
 class BlogForm(forms.Form):
     title = forms.CharField(required=True)

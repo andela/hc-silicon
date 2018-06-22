@@ -12,8 +12,13 @@ gunicorn==19.8.1
 lxml==4.2.1
 premailer==2.9.6
 psycopg2==2.7.3.2
+PyGithub==1.39
+PyJWT==1.6.4
+PySocks==1.6.8
+pytz==2018.4
 rcssmin==1.0.6
 requests==2.9.1
 rjsmin==1.0.12
 six==1.11.0
+twilio==6.14.4
 whitenoise==3.3.1

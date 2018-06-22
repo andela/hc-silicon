@@ -2,9 +2,13 @@ from collections import Counter
 from datetime import timedelta as td
 from itertools import tee
 import re
+import json
+from uuid import uuid4
 from django.core.validators import validate_email
 
 import requests
+import github
+from github import Github
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -18,8 +22,10 @@ from django.utils.six.moves.urllib.parse import urlencode
 from hc.api.decorators import uuid_or_400
 from hc.api.models import DEFAULT_GRACE, DEFAULT_TIMEOUT, Channel, Check, Ping, Blog, BlogCategories
 from hc.accounts.models import Member, Department
+from hc.api.models import Platforms
 from hc.front.forms import (AddChannelForm, AddWebhookForm, NameTagsForm, EscalationForm, PriorityForm,
-                            TimeoutForm, EmailTaskForm, BackupTaskForm BlogForm, BlogCategoriesForm)
+                            TimeoutForm, AddGitWebhookForm, BlogForm, BlogCategoriesForm,
+                            EmailTaskForm, BackupTaskForm)
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from hc.lib import emails
@@ -375,7 +381,7 @@ def log(request, code):
     # and don't want to handle a special case of a check with a single ping.
     pings.append(Ping(created=timezone.now()))
 
-    # Now go through pings, calculate time gaps, and decorate
+    # Now go throuGithub pings, calculate time gaps, and decorate
     # the pings list for convenient use in template
     wrapped = []
 
@@ -733,6 +739,162 @@ def unresolved_issues(request):
         "ping_endpoint": settings.PING_ENDPOINT,
     }
     return render(request, "front/issues.html", ctx)
+
+@login_required
+def checks_platforms(request):
+    ''' Third party programs '''
+    assert request.method == "GET"
+    user = request.team.user
+    try:
+        api = Platforms.objects.get(name="github", user=user)
+        if api.granted:
+            repos = api.entities or list()
+            github_integration = True
+        else:
+            repos = list()
+            github_integration = False
+    except Platforms.DoesNotExist:
+        repos = list()
+        github_integration = False
+    ctx = {
+        "page": "third-party-checks",
+        "repos": repos,
+        "github": github_integration,
+    }
+    return render(request, "front/platforms_checks.html", ctx)
+
+@login_required
+def check_github(request):
+    ''' Third party programs '''
+    assert request.method == "GET"
+    user = request.team.user
+    link = 'https://github.com/login/oauth/authorize?client_id={}&redirect_uri&scope=repo,write:repo_hook&state={}'
+    client_id = settings.GITHUB_OAUTH_APP_ID
+    client_secret = settings.GITHUB_OAUTH_APP_SECRET
+    state_code = uuid4().hex
+    code = request.GET.get("code")
+    state = request.GET.get("state")
+    if code and state and len(code) > 2 and len(code) > 2:
+        try:
+            api = Platforms.objects.get(name="github", user=user, state=state)
+            redirect_uri = '{}/checks/platforms/github/'.format(settings.SITE_ROOT)
+            print(redirect_uri)
+            payload = {
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'code': code,
+                'redirect_uri': redirect_uri,
+                'state': state,
+            }
+            try:
+                r = requests.post("https://github.com/login/oauth/access_token",
+                                 data=payload, headers={'Accept': 'application/json'})
+                response = r.json()
+                print(r.json())
+                if r.status_code == 200 and 'access_token' in response:
+                    print(r.json())
+                    api.code = code
+                    api.access_token = response['access_token']
+                    api.token_type = response['token_type']
+                    api.scopes = response['scope']
+                    api.granted = True
+                    print(api.access_token)
+                    api.save()
+                return redirect('hc-platforms')
+            except requests.HTTPError:
+                pass
+            api.code = code
+            api.save()
+        except Platforms.DoesNotExist:
+            return HttpResponseBadRequest()
+    try:
+        api = Platforms.objects.get(name="github", user=user)
+        api.state = state_code
+    except Platforms.DoesNotExist:
+        api = Platforms(name='github', state=state_code, user=user)
+        
+    api.save()
+
+    link = link.format(client_id, state_code)
+    return redirect(link)
+
+@login_required
+def create_github_webhook(request):
+    ''' Create a github webhook '''
+    assert request.method == "POST"
+    user = request.team.user
+    form = AddGitWebhookForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+    try:
+        api = Platforms.objects.get(name="github", user=user)
+        if api.granted:
+            try:
+                g = Github(api.access_token)
+                repos = g.get_user().get_repos()
+                github_integration = True
+                dept=None
+                if request.team.user.id != request.user.id:
+                    member = Member.objects.get(team=request.team,user=request.user)
+                    dept =  member.department
+                repo_name = form.cleaned_data["repo_name"]
+                check_repo_name = 'Github-{}'.format(repo_name)
+                check = Check(name=check_repo_name, user=request.team.user, department=dept)
+                check.save()
+                check.assign_all_channels()
+
+                user_repo = g.get_user().get_repo(repo_name)
+                ping_url = settings.PING_ENDPOINT+str(check.code)
+                user_repo.create_hook("web", {"url": ping_url})
+                all_entities = api.entities or list()
+                all_entities.append(repo_name)
+                api.entities = all_entities
+                api.save()
+            except github.GithubException as e:
+                print(e)
+                pass
+    except Platforms.DoesNotExist:
+        return HttpResponseBadRequest()
+    return redirect('hc-platforms')
+
+@login_required
+def github_repos(request):
+    ''' Return repositories'''
+    user = request.team.user
+    try:
+        api = Platforms.objects.get(name="github", user=user)
+        if api.granted:
+            try:
+                g = Github(api.access_token)
+                repos = g.get_user().get_repos()
+                github_integration = True
+            except github.GithubException as e:
+                print(e)
+                api.granted = False
+                api.access_token = None
+                api.code = None
+                api.save()
+                repos = list()
+                github_integration = False
+        else:
+            repos = list()
+            github_integration = False
+    except Platforms.DoesNotExist:
+        repos = list()
+        github_integration = False
+    repositories = list()
+    entities = api.entities or list()
+    for repo in repos:
+        if repo.name in entities:
+            continue
+        else:
+            repositories.append(repo.name)
+    response = {
+        "repos": repositories,
+        "github": github_integration,
+    }
+
+    return HttpResponse(json.dumps(response), content_type="application/json")
 
 def blog(request):
 
