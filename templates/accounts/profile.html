@@ -422,6 +422,16 @@
                                 class="form-control"
                                 name="department"
                                 placeholder="Department...">
+                        </div> 
+                    </div>
+                    <div for="itm-email" class="form-group">
+                        <label class="col-sm-2 control-label">Assign a check</label>
+                        <div class="col-sm-9">
+                            <select name="check" class="form-control" id="sel2">
+                                {% for check in checks %}
+                                    <option value="{{ check.name }}">{{ check.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                 </div>

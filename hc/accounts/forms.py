@@ -24,6 +24,7 @@ class SetPasswordForm(forms.Form):
 class InviteTeamMemberForm(forms.Form):
     email = LowercaseEmailField()
     department = forms.CharField(required=False)
+    check = forms.CharField()
 
 
 class RemoveTeamMemberForm(forms.Form):
